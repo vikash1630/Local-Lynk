@@ -1,0 +1,48 @@
+// models/User.js
+const mongoose = require("mongoose");
+
+const userSchema = new mongoose.Schema(
+  {
+    name: {
+      type: String,
+      trim: true
+    },
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+      lowercase: true
+    },
+    password: {
+      type: String,
+      required: true
+    },
+    age: {
+      type: Number,
+      min: 0,
+      default: 0,
+    },
+    location: {
+      type: {
+        type: String,
+        enum: ["Point"],
+        default: "Point"
+      },
+      coordinates: {
+        type: [Number],
+        default: [78.4867, 17.3850] // Hyderabad, India (lng, lat)
+      }
+    },
+
+    friends: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" },],
+    products: [{ type: mongoose.Schema.Types.ObjectId, ref: "Product" }],
+    services: [{ type: mongoose.Schema.Types.ObjectId, ref: "Service" }],
+    chats: [{ type: mongoose.Schema.Types.ObjectId, ref: "Chat" }],
+    cart: [{ type: mongoose.Schema.Types.ObjectId, ref: "Product" }],
+  },
+  { timestamps: true }
+);
+
+userSchema.index({ location: "2dsphere" });
+
+module.exports = mongoose.model("User", userSchema);
