@@ -2,7 +2,7 @@ const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 
 exports.signUp = async (data) => {
-    const { name, email, password, confirmPassword, age } = data;
+    const { name, email, password, confirmPassword, age, } = data;
 
     // What is 400 error code? -> Bad Request - server received request and understood it, but the request is invalid so refused to process it because input is wrong.
 
@@ -50,7 +50,11 @@ exports.signUp = async (data) => {
     const user = await User.create({
         name,
         email,
-        password: hashedPassword
+        password: hashedPassword,
+        // location: {
+        //     type: "Point",
+        //     coordinates: [lng, lat]   // longitude first, latitude second
+        // }
     });
 
     return {

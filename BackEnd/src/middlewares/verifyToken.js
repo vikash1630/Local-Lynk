@@ -17,6 +17,9 @@ const verifyToken = (req, res, next) => {
     // 2️⃣ Verify token
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
+    console.log("Decoded Token:", decoded);
+
+    
     // 3️⃣ Attach user info to request
     req.user = decoded; // { userId: ... }
 

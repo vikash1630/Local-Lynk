@@ -11,11 +11,24 @@ const productSchema = new mongoose.Schema(
       enum: ["available", "sold"],
       default: "available",
     },
+    location: {
+      type: {
+        type: String,
+        enum: ["Point"],
+        default: "Point"
+      },
+      coordinates: {
+        type: [Number],
+        default: [78.4867, 17.3850] // Hyderabad, India (lng, lat)
+      }
+    },
     images: [String],
     owner: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
   },
   { timestamps: true }
 );
+
+productSchema.index({ location: "2dsphere" })
 
 module.exports = mongoose.model("Product", productSchema);
 

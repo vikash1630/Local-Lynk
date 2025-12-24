@@ -46,14 +46,20 @@ const chatRoute = require("./src/socket/chat");
 
 // Upload route
 const uploadRoute = require("./src/routes/uploadFileRoute");
-app.use("/api/chat", uploadRoute);
 
+// add Friend Route
+const addFriendRoute = require("./src/routes/addFriendRoute");
+
+// Add Product Route
+const addProductRoute = require("./src/routes/addProductRoute");
 
 // Use Routes
 app.use("/api", signUpRoute);
 app.use("/api", LoginRoute);
 app.use("/api/chat", chatRoute);
-
+app.use("/api/chat", uploadRoute);
+app.use("/api", addFriendRoute);
+app.use("/api/product", addProductRoute);
 
 
 /* attach socket function */
