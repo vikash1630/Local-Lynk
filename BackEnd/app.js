@@ -1,6 +1,8 @@
 const express = require("express");
 
 const cors = require("cors");
+const cookieParser = require("cookie-parser");
+
 
 const app = express();
 app.use((req, res, next) => {
@@ -8,8 +10,12 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use(cors());
+app.use(cors({
+  origin: "http://localhost:5173", // Adjust this to your frontend's origin
+  credentials: true
+}));
 app.use(express.json());
+app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 
 
@@ -53,9 +59,17 @@ const addFriendRoute = require("./src/routes/addFriendRoute");
 // Add Product Route
 const addProductRoute = require("./src/routes/addProductRoute");
 
+// logout route
+const logoutRoute = require("./src/routes/LogoutRoute");
+
+// Google Login Route
+const googleLoginRoute = require("./src/routes/googleLoginRoute");
+
 // Use Routes
 app.use("/api", signUpRoute);
 app.use("/api", LoginRoute);
+app.use("/api", googleLoginRoute);
+app.use("/api", logoutRoute);
 app.use("/api/chat", chatRoute);
 app.use("/api/chat", uploadRoute);
 app.use("/api", addFriendRoute);

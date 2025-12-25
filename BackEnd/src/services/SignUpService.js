@@ -14,7 +14,7 @@ exports.signUp = async (data) => {
     }
 
     // password match validation
-    if (password !== confirmPassword) {
+    if (password != confirmPassword) {
         const error = new Error("Passwords do not match");
         error.statusCode = 400;
         throw error;

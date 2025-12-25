@@ -1,2 +1,5 @@
 # Backend env file
 BackEnd/.env
+
+# Frontend env file
+FrontEnd/.env
