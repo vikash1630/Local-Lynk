@@ -65,6 +65,19 @@ const logoutRoute = require("./src/routes/LogoutRoute");
 // Google Login Route
 const googleLoginRoute = require("./src/routes/googleLoginRoute");
 
+// Nearby Products Route
+const nearByProductsRoute = require("./src/routes/NearByProductsRoute")
+
+// Search Route
+const searchRoute = require("./src/routes/ProductSearchRoute")
+
+// product by id route
+const productByIdRoute = require("./src/routes/productByIdRoute")
+
+// Product List Route
+const productListRoute = require("./src/routes/productListRoute")
+
+
 // Use Routes
 app.use("/api", signUpRoute);
 app.use("/api", LoginRoute);
@@ -74,7 +87,10 @@ app.use("/api/chat", chatRoute);
 app.use("/api/chat", uploadRoute);
 app.use("/api", addFriendRoute);
 app.use("/api/product", addProductRoute);
-
+app.use("/api/product", nearByProductsRoute);
+app.use("/api/product", searchRoute);
+app.use("/api/product", productByIdRoute);
+app.use("/api/products", productListRoute);
 
 /* attach socket function */
 app.set("chatSocket", require("./src/socket/chat"));

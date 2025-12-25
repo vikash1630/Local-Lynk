@@ -5,6 +5,8 @@ import SignUp from './pages/SignUp.jsx';
 import Login from './pages/Login.jsx';
 import Home from './pages/Home.jsx';
 import Logout from './pages/Logout.jsx';
+import ProductDetails from './pages/ProductDetails.jsx';
+import Products from './pages/Products.jsx';
 
 
 const App = () => {
@@ -33,6 +35,16 @@ const App = () => {
       path: "/logout",
       element: <Logout />
       // to log out users
+    },
+    {
+      path: "/products",
+      element: <Products />
+      // to view all products
+    },
+    {
+      path: "/product/:id",
+      element: <ProductDetails />
+      // to view product details
     }
   ]);
 
