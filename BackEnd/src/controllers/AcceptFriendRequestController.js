@@ -2,7 +2,7 @@ const acceptFriendRequestService = require("../services/AcceptFriendRequestServi
 
 exports.acceptFriendRequestController = async (req, res) => {
   try {
-    const receiverId = req.user.id // from verifyToken
+    const receiverId = req.user.userId || req.user.id;
     const { senderUserId } = req.params;
     console.log("Receiver ID:", receiverId);
     console.log("Sender User ID:", senderUserId);
