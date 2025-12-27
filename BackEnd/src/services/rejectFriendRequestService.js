@@ -2,19 +2,15 @@ const User = require("../models/User");
 const mongoose = require("mongoose");
 
 exports.rejectFriendRequest = async (receiverId, senderId) => {
-  // ❌ Same user
-  if (receiverId.toString() === senderId.toString()) {
-    const err = new Error("You cannot reject your own request");
+  if (!mongoose.Types.ObjectId.isValid(receiverId) ||
+      !mongoose.Types.ObjectId.isValid(senderId)) {
+    const err = new Error("Invalid user ID");
     err.statusCode = 400;
     throw err;
   }
 
-  // ❌ Invalid ObjectIds
-  if (
-    !mongoose.Types.ObjectId.isValid(receiverId) ||
-    !mongoose.Types.ObjectId.isValid(senderId)
-  ) {
-    const err = new Error("Invalid user ID");
+  if (receiverId.toString() === senderId.toString()) {
+    const err = new Error("You cannot reject your own request");
     err.statusCode = 400;
     throw err;
   }
@@ -22,60 +18,57 @@ exports.rejectFriendRequest = async (receiverId, senderId) => {
   const receiver = await User.findById(receiverId);
   const sender = await User.findById(senderId);
 
-  if (!receiver) {
-    const err = new Error("Receiver not found");
+  if (!receiver || !sender) {
+    const err = new Error("User not found");
     err.statusCode = 404;
     throw err;
   }
 
-  if (!sender) {
-    const err = new Error("Sender not found");
-    err.statusCode = 404;
-    throw err;
-  }
-
-  // ❌ Already friends
-  if (receiver.friends.includes(senderId)) {
+  // ❌ already friends
+  if (receiver.friends.some(id => id.toString() === senderId.toString())) {
     const err = new Error("You are already friends");
     err.statusCode = 400;
     throw err;
   }
 
-  // ❌ Blocked check
+  // ❌ blocked
   if (
-    receiver.blockedUsers.includes(senderId) ||
-    sender.blockedUsers.includes(receiverId)
+    receiver.blockedUsers.some(id => id.toString() === senderId.toString()) ||
+    sender.blockedUsers.some(id => id.toString() === receiverId.toString())
   ) {
     const err = new Error("User is blocked");
     err.statusCode = 403;
     throw err;
   }
 
-  // ❌ No pending request
-  const hasReceived =
-    receiver.friendRequestsReceived.includes(senderId);
-  const hasSent =
-    sender.friendRequestsSent.includes(receiverId);
+  // ✅ STRICT ObjectId-safe checks
+  const hasReceived = receiver.friendRequestsReceived
+    .some(id => id.toString() === senderId.toString());
 
-  if (!hasReceived || !hasSent) {
+  const hasSent = sender.friendRequestsSent
+    .some(id => id.toString() === receiverId.toString());
+
+  if (!hasReceived && !hasSent) {
     const err = new Error("No pending friend request found");
     err.statusCode = 404;
     throw err;
   }
 
-  // ✅ Remove request
+  // ✅ HARD DELETE BOTH SIDES
   receiver.friendRequestsReceived =
     receiver.friendRequestsReceived.filter(
-      (id) => id.toString() !== senderId.toString()
+      id => id.toString() !== senderId.toString()
     );
 
   sender.friendRequestsSent =
     sender.friendRequestsSent.filter(
-      (id) => id.toString() !== receiverId.toString()
+      id => id.toString() !== receiverId.toString()
     );
 
-  await receiver.save();
-  await sender.save();
+  await Promise.all([
+    receiver.save(),
+    sender.save()
+  ]);
 
   return {
     message: "Friend request rejected successfully"

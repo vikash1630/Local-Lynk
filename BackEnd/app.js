@@ -96,6 +96,21 @@ const unblockUserRoute = require("./src/routes/UnBlockUserRoute")
 // Get Profile Details Route
 const getProfileRoute = require("./src/routes/GetProfileRoute")
 
+// Friends List Route
+const getFriendsRoute = require("./src/routes/GetFriendsRoute")
+
+// Unfriend Route
+const unFriendRoute = require("./src/routes/UnFriendRoute")
+
+// Blocked Users List Route
+const blockedUserListRoute = require("./src/routes/BlockedUserListRoute")
+
+// List of Friend Requests Route
+const getRequestsRoute = require("./src/routes/GetRequestsRoute")
+
+// List of Friend Requests Sent
+const getSentRequestsRoute = require("./src/routes/GetSentRequestsRoute")
+
 // Use Routes
 app.use("/api", signUpRoute);
 app.use("/api", LoginRoute);
@@ -115,6 +130,11 @@ app.use("/api/friend", rejectFriendRequestRoute);
 app.use("/api/user", blockUserRoute);
 app.use("/api/user", unblockUserRoute);
 app.use("/api/profile", getProfileRoute);
+app.use("/api/friends", getFriendsRoute);
+app.use("/api/friend", unFriendRoute);
+app.use("/api/user", blockedUserListRoute);
+app.use("/api/user", getRequestsRoute);
+app.use("/api/user", getSentRequestsRoute);
 
 
 /* attach socket function */

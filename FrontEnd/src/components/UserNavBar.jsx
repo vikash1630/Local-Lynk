@@ -69,6 +69,12 @@ const UserNavBar = () => {
         <Link to="/settings" className="text-gray-700 font-medium hover:text-blue-600">
           Settings
         </Link>
+        <Link to="/products" className="text-gray-700 font-medium hover:text-blue-600">
+          Products
+        </Link>
+        <Link to="/community" className="text-gray-700 font-medium hover:text-blue-600">
+          Community
+        </Link>
       </div>
 
       {/* SEARCH BAR */}

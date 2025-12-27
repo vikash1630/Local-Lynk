@@ -2,7 +2,7 @@ const rejectFriendRequestService = require("../services/rejectFriendRequestServi
 
 exports.rejectFriendRequest = async (req, res) => {
   try {
-    const receiverId = req.user.userId || req.user._id;
+    const receiverId = req.user.userId || req.user.id;
     const { senderId } = req.params;
 
     if (!senderId) {

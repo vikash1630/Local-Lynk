@@ -8,6 +8,8 @@ import Logout from './pages/Logout.jsx';
 import ProductDetails from './pages/ProductDetails.jsx';
 import Products from './pages/Products.jsx';
 import Profile from './pages/Profile.jsx';
+import Community from './pages/Community.jsx';
+import Chat from './pages/Chat.jsx';
 
 
 const App = () => {
@@ -51,6 +53,16 @@ const App = () => {
       path: "/profile",
       element: <Profile />
       // to view user profile
+    },
+    {
+      path: "/community",
+      element: <Community />
+      // to view community page
+    },
+    {
+      path: "/chat",
+      element: <Chat />
+      // to view chat page
     }
   ]);
 

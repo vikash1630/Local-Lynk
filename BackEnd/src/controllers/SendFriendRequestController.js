@@ -2,7 +2,7 @@ const sendFriendRequestService = require("../services/SendFriendRequestService")
 
 exports.sendFriendRequestController = async (req, res) => {
   try {
-    const senderId = req.user.id;
+    const senderId = req.user.userId || req.user.id;
     console.log("Sender ID:", senderId);
     const { targetUserId } = req.params;
 
