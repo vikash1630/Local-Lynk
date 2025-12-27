@@ -32,13 +32,19 @@ exports.googleLogin = async (req, res) => {
       { expiresIn: "7d" }
     );
 
+    console.log("JWT Token Generated:", jwtToken);
+
     res.cookie("token", jwtToken, {
       httpOnly: true,
       sameSite: "lax",
       secure: false
     });
 
-    res.status(200).json({ message: "Google login success" });
+    console.log("user id :", user.id);
+    return res.status(200).json({      message: "Google authentication successful",
+      token: jwtToken,
+      userId: user._id,
+    });
   } catch (err) {
     res.status(401).json({ message: "Google authentication failed" });
   }

@@ -33,7 +33,9 @@ const userSchema = new mongoose.Schema(
         default: [78.4867, 17.3850] // Hyderabad, India (lng, lat)
       }
     },
-
+    blockedUsers: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+    friendRequestsSent: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+    friendRequestsReceived: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
     friends: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" },],
     products: [{ type: mongoose.Schema.Types.ObjectId, ref: "Product" }],
     services: [{ type: mongoose.Schema.Types.ObjectId, ref: "Service" }],

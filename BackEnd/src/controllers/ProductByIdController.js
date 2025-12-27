@@ -5,7 +5,9 @@ exports.getProductDetails = async (req, res) => {
     const { productId } = req.params;
 
     const product = await productService.getProductById(productId);
-
+    if (!product) {
+      return res.status(404).json({ message: "Product not found" });
+    }
     res.status(200).json(product);
   } catch (error) {
     res.status(error.statusCode || 500).json({

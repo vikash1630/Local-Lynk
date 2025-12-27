@@ -8,6 +8,7 @@ exports.signUp = async (req, res) => {
 
     return res.status(201).json(result);
   } catch (error) {
+    console.log("Error in SignUpController:", error);
     return res.status(error.statusCode || 500).json({
       message: error.message || "Signup failed"
     });

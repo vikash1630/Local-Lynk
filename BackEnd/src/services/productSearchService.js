@@ -5,7 +5,7 @@ exports.searchByName = async (query) => {
 
   const products = await Product.find({
     name: {
-      $regex: `^${query}`, // 👈 PREFIX MATCH
+      $regex: query,
       $options: "i"        // case-insensitive
     },
     status: "available"    // optional, but recommended

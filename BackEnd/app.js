@@ -53,8 +53,6 @@ const chatRoute = require("./src/socket/chat");
 // Upload route
 const uploadRoute = require("./src/routes/uploadFileRoute");
 
-// add Friend Route
-const addFriendRoute = require("./src/routes/addFriendRoute");
 
 // Add Product Route
 const addProductRoute = require("./src/routes/addProductRoute");
@@ -77,6 +75,12 @@ const productByIdRoute = require("./src/routes/productByIdRoute")
 // Product List Route
 const productListRoute = require("./src/routes/productListRoute")
 
+// Send Friend Request Route
+const sendFriendRequestRoute = require("./src/routes/SendFriendRequestRoute");
+
+// Accept Friend Request Route
+const acceptFriendRequestRoute = require("./src/routes/AcceptFriendRequestRoute")
+
 
 // Use Routes
 app.use("/api", signUpRoute);
@@ -85,12 +89,14 @@ app.use("/api", googleLoginRoute);
 app.use("/api", logoutRoute);
 app.use("/api/chat", chatRoute);
 app.use("/api/chat", uploadRoute);
-app.use("/api", addFriendRoute);
 app.use("/api/product", addProductRoute);
 app.use("/api/product", nearByProductsRoute);
 app.use("/api/product", searchRoute);
 app.use("/api/product", productByIdRoute);
 app.use("/api/products", productListRoute);
+app.use("/api/friend", sendFriendRequestRoute);
+app.use("/api/friend", acceptFriendRequestRoute);
+
 
 /* attach socket function */
 app.set("chatSocket", require("./src/socket/chat"));

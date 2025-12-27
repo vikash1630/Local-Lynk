@@ -19,9 +19,10 @@ const verifyToken = (req, res, next) => {
 
     console.log("Decoded Token:", decoded);
 
-    
+    console.log("Token verified successfully");
     // 3️⃣ Attach user info to request
     req.user = decoded; // { userId: ... }
+    console.log("User info attached to request as :", req.user);
 
     next(); // allow request
   } catch (err) {
