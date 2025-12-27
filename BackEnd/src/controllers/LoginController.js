@@ -13,12 +13,12 @@ exports.login = async (req, res) => {
       maxAge: 7 * 24 * 60 * 60 * 1000
     });
 
-    console.log("Cookie with user : ", result.user);
+    console.log("Cookie with user : ", result.userId);
     console.log("Cookie set with token:", result.token);
 
     return res.status(200).json({
       message: "Login successful",
-      user: result.user
+      user: result.userId
     });
 
   } catch (error) {

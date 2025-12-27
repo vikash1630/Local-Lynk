@@ -7,6 +7,7 @@ import Home from './pages/Home.jsx';
 import Logout from './pages/Logout.jsx';
 import ProductDetails from './pages/ProductDetails.jsx';
 import Products from './pages/Products.jsx';
+import Profile from './pages/Profile.jsx';
 
 
 const App = () => {
@@ -45,6 +46,11 @@ const App = () => {
       path: "/product/:id",
       element: <ProductDetails />
       // to view product details
+    },
+    {
+      path: "/profile",
+      element: <Profile />
+      // to view user profile
     }
   ]);
 
