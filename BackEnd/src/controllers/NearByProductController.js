@@ -25,7 +25,7 @@ exports.getNearbyProducts = async (req, res) => {
     if (!products) {
         return res.status(404).json({ message: 'No nearby products found.' });
     }
-    res.status(200).json({ products });
+    res.status(200).json(products);
     } catch (error) {
         console.log("Error From Controller");       
         res.status(500).json({ message: 'Server error while fetching nearby products.', error: error.message });

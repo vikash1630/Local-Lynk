@@ -6,12 +6,10 @@ const UserNavBar = () => {
   const [suggestions, setSuggestions] = useState([]);
 
   const API_URL = import.meta.env.VITE_API_URL;
-  const navigate = useNavigate(); // ✅ FIX
+  const navigate = useNavigate();
 
   useEffect(() => {
-
     const timer = setTimeout(async () => {
-      console.log("Typing:", query);
       if (!query.trim()) {
         setSuggestions([]);
         return;
@@ -23,26 +21,25 @@ const UserNavBar = () => {
           {
             method: "GET",
             credentials: "include",
-            headers: {
-              "Content-Type": "application/json",
-            },
+            headers: { "Content-Type": "application/json" },
           }
         );
 
-        if (!res.ok) {
-          throw new Error("Failed to fetch suggestions");
-        }
-
         const data = await res.json();
         setSuggestions(data);
-      } catch (error) {
-        console.error("Error fetching search suggestions:", error);
+      } catch {
         setSuggestions([]);
       }
     }, 300);
 
     return () => clearTimeout(timer);
   }, [query, API_URL]);
+
+  const handleSearch = () => {
+    if (!query.trim()) return;
+    setSuggestions([]);
+    navigate(`/products?search=${encodeURIComponent(query)}`);
+  };
 
   const handleSuggestionClick = (productId) => {
     setSuggestions([]);
@@ -51,42 +48,40 @@ const UserNavBar = () => {
   };
 
   const handleKeyDown = (e) => {
-    if (e.key === "Enter" && query.trim()) {
-      setSuggestions([]);
-      navigate(`/products?search=${encodeURIComponent(query)}`);
+    if (e.key === "Enter") {
+      handleSearch();
     }
   };
 
-
   return (
     <nav className="flex items-center justify-between px-6 py-3 bg-white border-b border-gray-200">
-
       {/* LEFT LINKS */}
       <div className="flex items-center gap-6">
-        <Link to="/profile" className="text-gray-700 font-medium hover:text-blue-600">
-          Profile
-        </Link>
-        <Link to="/settings" className="text-gray-700 font-medium hover:text-blue-600">
-          Settings
-        </Link>
-        <Link to="/products" className="text-gray-700 font-medium hover:text-blue-600">
-          Products
-        </Link>
-        <Link to="/community" className="text-gray-700 font-medium hover:text-blue-600">
-          Community
-        </Link>
+        <Link to="/profile" className="text-gray-700 font-medium hover:text-blue-600">Profile</Link>
+        <Link to="/home" className="text-gray-700 font-medium hover:text-blue-600">Home</Link>
+        <Link to="/products" className="text-gray-700 font-medium hover:text-blue-600">Products</Link>
+        <Link to="/community" className="text-gray-700 font-medium hover:text-blue-600">Community</Link>
+        <Link to="/my-cart" className="text-gray-700 font-medium hover:text-blue-600">My Cart</Link>
+        <Link to="/sell-products" className="text-gray-700 font-medium hover:text-blue-600">Sell Products</Link>
       </div>
 
-      {/* SEARCH BAR */}
-      <div className="relative w-72">
+      {/* SEARCH BAR + BUTTON */}
+      <div className="relative flex items-center w-96">
         <input
           type="text"
           placeholder="Search products..."
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           onKeyDown={handleKeyDown}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md outline-none focus:border-black"
+          className="flex-1 px-3 py-2 border border-gray-300 rounded-l-md outline-none focus:border-black"
         />
+
+        <button
+          onClick={handleSearch}
+          className="px-4 py-2 bg-black text-white rounded-r-md hover:bg-gray-800 text-sm"
+        >
+          Search
+        </button>
 
         {suggestions.length > 0 && (
           <ul className="absolute top-11 left-0 w-full bg-white border border-gray-200 rounded-md shadow-md z-20">

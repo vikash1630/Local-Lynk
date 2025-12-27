@@ -40,7 +40,21 @@ const userSchema = new mongoose.Schema(
     products: [{ type: mongoose.Schema.Types.ObjectId, ref: "Product" }],
     services: [{ type: mongoose.Schema.Types.ObjectId, ref: "Service" }],
     chats: [{ type: mongoose.Schema.Types.ObjectId, ref: "Chat" }],
-    cart: [{ type: mongoose.Schema.Types.ObjectId, ref: "Product" }],
+    cart: [
+      {
+        product: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "Product",
+          required: true,
+        },
+        quantity: {
+          type: Number,
+          default: 1,
+          min: 1,
+        },
+      },
+    ],
+
   },
   { timestamps: true }
 );

@@ -111,6 +111,18 @@ const getRequestsRoute = require("./src/routes/GetRequestsRoute")
 // List of Friend Requests Sent
 const getSentRequestsRoute = require("./src/routes/GetSentRequestsRoute")
 
+// All Products Route
+const AllproductListRoute = require("./src/routes/AllProductsRoute")
+
+// Add to Cart Route
+const addToCartRoute = require("./src/routes/AddToCartRoute")
+
+// Remove from Cart Route
+const removeFromCartRoute = require("./src/routes/RemoveFromCartRoute")
+
+// List of Cart Items Route
+const cartItemsRoute = require("./src/routes/CartListRoute")
+
 // Use Routes
 app.use("/api", signUpRoute);
 app.use("/api", LoginRoute);
@@ -135,7 +147,10 @@ app.use("/api/friend", unFriendRoute);
 app.use("/api/user", blockedUserListRoute);
 app.use("/api/user", getRequestsRoute);
 app.use("/api/user", getSentRequestsRoute);
-
+app.use("/api/products", AllproductListRoute);
+app.use("/api/cart", addToCartRoute);
+app.use("/api/cart", removeFromCartRoute);
+app.use("/api/cart", cartItemsRoute);
 
 /* attach socket function */
 app.set("chatSocket", require("./src/socket/chat"));

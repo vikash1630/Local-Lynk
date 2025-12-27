@@ -19,6 +19,7 @@ exports.findNearbyProducts = async (latitude, longitude, distance) => {
             }
         });
 
+        console.log("Products in Service:", products);
         return products;
     }
     catch (error) {

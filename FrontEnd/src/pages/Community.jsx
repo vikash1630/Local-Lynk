@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import UserNavBar from "../components/UserNavBar.jsx";
 
 const Community = () => {
   const API_URL = import.meta.env.VITE_API_URL;
@@ -181,6 +182,9 @@ const Community = () => {
   }
 
   return (
+    <div>
+      <UserNavBar />
+      
     <div className="max-w-6xl mx-auto p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
 
       {/* ===== FRIENDS ===== */}
@@ -304,7 +308,7 @@ const Community = () => {
         )}
       </div>
 
-    </div>
+    </div></div>
   );
 };
 

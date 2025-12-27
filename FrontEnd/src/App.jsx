@@ -6,10 +6,14 @@ import Login from './pages/Login.jsx';
 import Home from './pages/Home.jsx';
 import Logout from './pages/Logout.jsx';
 import ProductDetails from './pages/ProductDetails.jsx';
-import Products from './pages/Products.jsx';
+import Products from './pages/SearchProducts.jsx';
 import Profile from './pages/Profile.jsx';
 import Community from './pages/Community.jsx';
 import Chat from './pages/Chat.jsx';
+import MyCart from './pages/MyCart.jsx';
+import BuyNow from './pages/BuyNow.jsx';
+import CheckOut from './pages/CheckOut.jsx';
+import Sellproducts from './pages/Sellproducts.jsx';
 
 
 const App = () => {
@@ -63,6 +67,26 @@ const App = () => {
       path: "/chat",
       element: <Chat />
       // to view chat page
+    },
+    {
+      path: "/my-cart",
+      element: <MyCart />
+      // to view user's cart
+    },
+    {
+      path: "/buy-now/:id",
+      element: <BuyNow />
+      // to view buy now page
+    },
+    {
+      path: "checkout",
+      element: <CheckOut />
+      // to view checkout page
+    },
+    {
+      path: "sell-products",
+      element: <Sellproducts />
+      // to view sell products page
     }
   ]);
 
