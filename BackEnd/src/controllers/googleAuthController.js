@@ -32,6 +32,7 @@ exports.googleLogin = async (req, res) => {
       { expiresIn: "7d" }
     );
 
+    console.log("user :", user.name);
     console.log("JWT Token Generated:", jwtToken);
 
     res.cookie("token", jwtToken, {

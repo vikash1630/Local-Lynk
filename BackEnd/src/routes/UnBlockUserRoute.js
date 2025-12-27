@@ -1,13 +1,13 @@
 const express = require("express");
 const router = express.Router();
 
-const { blockUser } = require("../controllers/BlockUserController");
+const { unblockUser } = require("../controllers/UnBlockUserController")
 const verifyToken = require("../middlewares/verifyToken");
 
 router.post(
-  "/block/:userId",
+  "/unblock/:userId",
   verifyToken,
-  blockUser
+  unblockUser
 );
 
 module.exports = router;

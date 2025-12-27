@@ -1,13 +1,14 @@
 const express = require("express");
 const router = express.Router();
 
-const { blockUser } = require("../controllers/BlockUserController");
+const { getUsers } = require("../controllers/UserListController")
 const verifyToken = require("../middlewares/verifyToken");
 
-router.post(
-  "/block/:userId",
+// Get top 5 users (search by name or email)
+router.get(
+  "/",
   verifyToken,
-  blockUser
+  getUsers
 );
 
 module.exports = router;

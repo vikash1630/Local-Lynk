@@ -1,13 +1,14 @@
 const express = require("express");
 const router = express.Router();
 
-const { blockUser } = require("../controllers/BlockUserController");
+const { getUserDetails } = require("../controllers/GetProfileDetailsController")
 const verifyToken = require("../middlewares/verifyToken");
 
+// Get user details by ID
 router.post(
-  "/block/:userId",
+  "/",
   verifyToken,
-  blockUser
+  getUserDetails
 );
 
 module.exports = router;

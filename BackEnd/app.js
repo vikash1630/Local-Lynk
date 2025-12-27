@@ -75,12 +75,26 @@ const productByIdRoute = require("./src/routes/productByIdRoute")
 // Product List Route
 const productListRoute = require("./src/routes/productListRoute")
 
+// User List Route
+const userListRoute = require("./src/routes/UsersListRoute");
+
 // Send Friend Request Route
 const sendFriendRequestRoute = require("./src/routes/SendFriendRequestRoute");
 
 // Accept Friend Request Route
 const acceptFriendRequestRoute = require("./src/routes/AcceptFriendRequestRoute")
 
+// Reject Friend Request Route
+const rejectFriendRequestRoute = require("./src/routes/RejectFriendRequestRoute");
+
+// Block User Route
+const blockUserRoute = require("./src/routes/BlockUserRoute");
+
+// Unblock User Route
+const unblockUserRoute = require("./src/routes/UnBlockUserRoute")
+
+// Get Profile Details Route
+const getProfileRoute = require("./src/routes/GetProfileRoute")
 
 // Use Routes
 app.use("/api", signUpRoute);
@@ -94,8 +108,13 @@ app.use("/api/product", nearByProductsRoute);
 app.use("/api/product", searchRoute);
 app.use("/api/product", productByIdRoute);
 app.use("/api/products", productListRoute);
+app.use("/api/users", userListRoute);
 app.use("/api/friend", sendFriendRequestRoute);
 app.use("/api/friend", acceptFriendRequestRoute);
+app.use("/api/friend", rejectFriendRequestRoute);
+app.use("/api/user", blockUserRoute);
+app.use("/api/user", unblockUserRoute);
+app.use("/api/profile", getProfileRoute);
 
 
 /* attach socket function */
