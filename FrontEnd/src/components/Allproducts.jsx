@@ -14,50 +14,35 @@ const Allproducts = () => {
       try {
         const res = await fetch(`${API_URI}/api/products`);
         const data = await res.json();
-
-        if (Array.isArray(data)) {
-          setProducts(data);
-        } else {
-          console.error("Unexpected API response:", data);
-        }
-      } catch (error) {
-        console.error("Failed to load products", error);
-      }
+        if (Array.isArray(data)) setProducts(data);
+      } catch {}
     };
-
     fetchProducts();
   }, []);
 
-  /* ---------------- FETCH CART (PERMANENT DISABLE) ---------------- */
+  /* ---------------- FETCH CART ---------------- */
   useEffect(() => {
     const fetchCart = async () => {
       try {
         const res = await fetch(`${API_URI}/api/cart/items`, {
-          method: "GET",
           credentials: "include",
         });
-
         const data = await res.json();
 
         if (Array.isArray(data.cart)) {
-          const cartMap = {};
+          const map = {};
           data.cart.forEach((item) => {
-            cartMap[item.product._id] = true;
+            map[item.product._id] = true;
           });
-          setAddedToCart(cartMap);
+          setAddedToCart(map);
         }
-      } catch (error) {
-        console.error("Failed to sync cart", error);
-      }
+      } catch {}
     };
-
     fetchCart();
   }, []);
 
-  /* ---------------- ADD TO CART ---------------- */
   const addToCart = async (e, productId) => {
     e.stopPropagation();
-
     if (addedToCart[productId]) return;
 
     try {
@@ -65,14 +50,8 @@ const Allproducts = () => {
         method: "POST",
         credentials: "include",
       });
-
-      setAddedToCart((prev) => ({
-        ...prev,
-        [productId]: true,
-      }));
-    } catch (error) {
-      console.error("Add to cart failed", error);
-    }
+      setAddedToCart((prev) => ({ ...prev, [productId]: true }));
+    } catch {}
   };
 
   const buyNow = (e, productId) => {
@@ -80,60 +59,53 @@ const Allproducts = () => {
     navigate(`/buy-now/${productId}`);
   };
 
-  return (
-    <div className="px-6 py-8">
-      <h1 className="text-2xl font-bold mb-6">All Products</h1>
-
-      {products.length === 0 && (
-        <p className="text-gray-500">No products available</p>
-      )}
+return (
+  <div className="relative bg-transparent">
+    <div className="max-w-7xl mx-auto px-6 py-16">
+      <h1 className="text-3xl font-extrabold mb-10 bg-gradient-to-r from-amber-400 via-orange-400 to-indigo-400 text-transparent bg-clip-text">
+        All Products
+      </h1>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {products.map((product) => (
           <div
             key={product._id}
             onClick={() => navigate(`/product/${product._id}`)}
-            className="border rounded-lg p-4 shadow-sm hover:shadow-md transition cursor-pointer bg-white"
+            className="group rounded-2xl bg-slate-800/70 backdrop-blur-xl border border-slate-700 p-4 cursor-pointer shadow-lg transition hover:scale-[1.03]"
           >
             <img
               src={product.images?.[0] || "/placeholder.png"}
-              alt={product.name}
-              className="h-40 w-full object-cover rounded"
+              className="h-40 w-full object-cover rounded-xl"
             />
 
-            <h3 className="mt-3 font-semibold text-lg">
+            <h3 className="mt-3 text-lg font-semibold text-slate-200">
               {product.name}
             </h3>
 
-            <p className="text-gray-600 text-sm mt-1">
+            <p className="text-sm text-slate-400 line-clamp-2">
               {product.description}
             </p>
 
-            <p className="text-lg font-bold text-orange-600 mt-2">
+            <p className="text-xl font-bold text-amber-400 mt-2">
               ₹{product.price}
             </p>
 
             <div className="flex gap-3 mt-4">
-              {/* PERMANENTLY DISABLED IF IN CART */}
               <button
                 onClick={(e) => addToCart(e, product._id)}
                 disabled={addedToCart[product._id]}
-                className={`flex-1 py-2 rounded text-sm font-medium transition
-                  ${
-                    addedToCart[product._id]
-                      ? "bg-gray-300 cursor-not-allowed text-gray-700"
-                      : "bg-yellow-400 hover:bg-yellow-500"
-                  }`}
+                className={`flex-1 py-2 rounded text-sm font-medium ${
+                  addedToCart[product._id]
+                    ? "bg-slate-600 cursor-not-allowed"
+                    : "bg-amber-500 hover:bg-amber-600 text-slate-900"
+                }`}
               >
-                {addedToCart[product._id]
-                  ? "Added to Cart"
-                  : "Add to Cart"}
+                {addedToCart[product._id] ? "Added" : "Add to Cart"}
               </button>
 
-              {/* BUY NOW */}
               <button
                 onClick={(e) => buyNow(e, product._id)}
-                className="flex-1 py-2 rounded text-sm font-medium bg-orange-500 text-white hover:bg-orange-600 transition"
+                className="flex-1 py-2 rounded bg-rose-500 text-white hover:bg-rose-600"
               >
                 Buy Now
               </button>
@@ -142,7 +114,10 @@ const Allproducts = () => {
         ))}
       </div>
     </div>
-  );
+  </div>
+);
+
+
 };
 
 export default Allproducts;

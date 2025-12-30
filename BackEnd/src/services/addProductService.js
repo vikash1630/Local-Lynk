@@ -2,54 +2,73 @@ const User = require("../models/User");
 const Product = require("../models/Product");
 
 exports.addProduct = async (userId, data) => {
-    try {
-        // 1️⃣ Check if user exists
-        const user = await User.findById(userId);
-        if (!user) {
-            const error = new Error("User not found");
-            error.statusCode = 404;
-            throw error;
-        }
-
-        console.log("USER ID:", userId);
-        console.log("DATA:", data);
-
-
-        // 2️⃣ Destructure product data
-        const { name, description, price, status, lng, lat } = data;
-
-        // 3️⃣ Basic validation
-        if (!name || !price || !lng || !lat) {
-            const error = new Error("Required fields missing");
-            error.statusCode = 400;
-            throw error;
-        }
-
-        // 4️⃣ Create product with GeoJSON location
-        const product = await Product.create({
-            name,
-            description,
-            price,
-            status,
-            userId: user._id,
-            location: {
-                type: "Point",
-                coordinates: [lng, lat] // longitude first
-            }
-        });
-
-        // 5️⃣ Attach product to user (optional but recommended)
-        user.products.push(product._id);
-        await user.save();
-
-        // 6️⃣ Return response
-        return {
-            message: "Product added successfully",
-            product
-        };
-
-    } catch (error) {
-        console.error("Error in addProductService:", error);
-        throw error;
+  try {
+    // 1️⃣ Check if user exists
+    const user = await User.findById(userId);
+    if (!user) {
+      const error = new Error("User not found");
+      error.statusCode = 404;
+      throw error;
     }
+
+    // 2️⃣ Destructure & sanitize input
+    const {
+      name,
+      description,
+      price,
+      quantity = 1,
+      lng,
+      lat,
+      images = [],
+    } = data;
+
+    // 3️⃣ Validation
+    if (!name || price === undefined || lng === undefined || lat === undefined) {
+      const error = new Error("Name, price, longitude and latitude are required");
+      error.statusCode = 400;
+      throw error;
+    }
+
+    if (price < 0) {
+      const error = new Error("Price cannot be negative");
+      error.statusCode = 400;
+      throw error;
+    }
+
+    if (quantity < 0) {
+      const error = new Error("Quantity cannot be negative");
+      error.statusCode = 400;
+      throw error;
+    }
+
+    // 4️⃣ Create product (schema-compliant)
+    const product = await Product.create({
+      name: name.trim(),
+      description: description?.trim(),
+      price,
+      quantity,
+      status: quantity === 0 ? "sold" : "available",
+      images,
+      owner: user._id,
+      location: {
+        type: "Point",
+        coordinates: [lng, lat], // lng first
+      },
+    });
+
+    // 5️⃣ Attach product to user (only if your User model has products[])
+    if (Array.isArray(user.products)) {
+      user.products.push(product._id);
+      await user.save();
+    }
+
+    // 6️⃣ Return response
+    return {
+      message: "Product added successfully",
+      product,
+    };
+  } catch (error) {
+    console.error("Error in addProduct service:", error.message);
+    throw error;
+  }
 };

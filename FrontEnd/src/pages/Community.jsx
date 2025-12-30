@@ -6,20 +6,16 @@ const Community = () => {
   const API_URL = import.meta.env.VITE_API_URL;
   const navigate = useNavigate();
 
-  // canonical state (from list APIs)
   const [friends, setFriends] = useState([]);
   const [receivedRequests, setReceivedRequests] = useState([]);
   const [sentRequests, setSentRequests] = useState([]);
-
-  // current user (for self check)
   const [currentUserId, setCurrentUserId] = useState(null);
 
-  // UI state
   const [search, setSearch] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  /* ================= FETCH FUNCTIONS (MUST BE ABOVE useEffect) ================= */
+  /* ================= FETCH FUNCTIONS ================= */
 
   const fetchProfile = async () => {
     const res = await fetch(`${API_URL}/api/profile`, {
@@ -32,7 +28,6 @@ const Community = () => {
 
   const fetchFriends = async () => {
     const res = await fetch(`${API_URL}/api/friends`, {
-      method: "GET",
       credentials: "include",
     });
     const data = await res.json();
@@ -41,25 +36,20 @@ const Community = () => {
 
   const fetchReceivedRequests = async () => {
     const res = await fetch(`${API_URL}/api/user/requests/recieved`, {
-      method: "GET",
       credentials: "include",
     });
     const data = await res.json();
     setReceivedRequests(data.requests || []);
   };
 
-  // 🔥 BACKEND IS SOURCE OF TRUTH
   const fetchSentRequests = async () => {
     const res = await fetch(`${API_URL}/api/user/requests/sent`, {
-      method: "GET",
       credentials: "include",
     });
     const data = await res.json();
-    console.log("🔍 SENT REQUESTS API RESPONSE:", data);
     setSentRequests(data.requests || []);
   };
 
-  /* ================= INITIAL LOAD ================= */
   useEffect(() => {
     Promise.all([
       fetchProfile(),
@@ -70,6 +60,7 @@ const Community = () => {
   }, []);
 
   /* ================= LIVE SEARCH ================= */
+
   useEffect(() => {
     if (!search.trim()) {
       setSearchResults([]);
@@ -79,10 +70,7 @@ const Community = () => {
     const timer = setTimeout(async () => {
       const res = await fetch(
         `${API_URL}/api/users?search=${encodeURIComponent(search)}`,
-        {
-          method: "GET",
-          credentials: "include",
-        }
+        { credentials: "include" }
       );
       const data = await res.json();
       setSearchResults(data || []);
@@ -92,12 +80,13 @@ const Community = () => {
   }, [search]);
 
   /* ================= HELPERS ================= */
+
   const isFriend = (id) => friends.some((f) => f._id === id);
   const hasSentRequest = (id) => sentRequests.some((r) => r._id === id);
   const hasReceivedRequest = (id) =>
     receivedRequests.some((r) => r._id === id);
 
-  /* ================= ACTION APIs ================= */
+  /* ================= ACTIONS ================= */
 
   const sendRequest = async (user) => {
     if (
@@ -105,19 +94,15 @@ const Community = () => {
       isFriend(user._id) ||
       hasSentRequest(user._id) ||
       hasReceivedRequest(user._id)
-    ) {
+    )
       return;
-    }
 
     setSentRequests((prev) => [...prev, user]);
 
     try {
       await fetch(
         `${API_URL}/api/friend/send-friend-request/${user._id}`,
-        {
-          method: "POST",
-          credentials: "include",
-        }
+        { method: "POST", credentials: "include" }
       );
     } catch {
       setSentRequests((prev) =>
@@ -129,10 +114,7 @@ const Community = () => {
   const acceptRequest = async (user) => {
     await fetch(
       `${API_URL}/api/friend/accept-friend-request/${user._id}`,
-      {
-        method: "POST",
-        credentials: "include",
-      }
+      { method: "POST", credentials: "include" }
     );
 
     setReceivedRequests((prev) =>
@@ -144,10 +126,7 @@ const Community = () => {
   const rejectRequest = async (user) => {
     await fetch(
       `${API_URL}/api/friend/reject-friend-request/${user._id}`,
-      {
-        method: "POST",
-        credentials: "include",
-      }
+      { method: "POST", credentials: "include" }
     );
 
     setReceivedRequests((prev) =>
@@ -178,138 +157,158 @@ const Community = () => {
   };
 
   if (loading) {
-    return <div className="p-6">Loading community…</div>;
+    return (
+      <div className="min-h-screen flex items-center justify-center text-emerald-400">
+        Loading community…
+      </div>
+    );
   }
 
   return (
-    <div>
-      <UserNavBar />
-      
-    <div className="max-w-6xl mx-auto p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div className="relative min-h-screen bg-slate-900 overflow-hidden">
+      {/* 🌈 MULTI-GRADIENT BACKGROUND */}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(16,185,129,0.35),transparent_55%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom_right,rgba(20,184,166,0.35),transparent_55%)]" />
+      <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-slate-800 to-emerald-900/40" />
 
-      {/* ===== FRIENDS ===== */}
-      <div className="bg-white p-4 rounded shadow">
-        <h2 className="font-semibold mb-3">Friends</h2>
-        {friends.length === 0 ? (
-          <p>No friends yet</p>
-        ) : (
-          friends.map((f) => (
-            <div key={f._id} className="flex justify-between mb-2">
-              <span>{f.name}</span>
-              <div className="flex gap-2">
-                <button
-                  onClick={() => navigate("/chat")}
-                  className="bg-blue-500 text-white px-2 rounded"
-                >
-                  Chat
-                </button>
-                <button
-                  onClick={() => unfriend(f)}
-                  className="bg-yellow-500 text-white px-2 rounded"
-                >
-                  Unfriend
-                </button>
-                <button
-                  onClick={() => block(f)}
-                  className="bg-red-500 text-white px-2 rounded"
-                >
-                  Block
-                </button>
-              </div>
-            </div>
-          ))
-        )}
-      </div>
+      <div className="relative z-10">
+        <UserNavBar />
 
-      {/* ===== SEARCH USERS ===== */}
-      <div className="bg-white p-4 rounded shadow">
-        <h2 className="font-semibold mb-3">Search Users</h2>
-        <input
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="border p-2 w-full mb-3"
-          placeholder="Search by name or email"
-        />
+        <div className="max-w-7xl mx-auto px-4 py-10 grid grid-cols-1 md:grid-cols-2 gap-6">
 
-        {searchResults.map((u) => (
-          <div key={u._id} className="flex justify-between mb-2">
-            <span>{u.name}</span>
-
-            {u._id === currentUserId ? (
-              <button disabled className="bg-gray-300 px-2 rounded">
-                You
-              </button>
-            ) : isFriend(u._id) ? (
-              <button disabled className="bg-gray-300 px-2 rounded">
-                Friend
-              </button>
-            ) : hasSentRequest(u._id) ? (
-              <button disabled className="bg-gray-300 px-2 rounded">
-                Request Sent
-              </button>
-            ) : hasReceivedRequest(u._id) ? (
-              <button disabled className="bg-gray-300 px-2 rounded">
-                Request Received
-              </button>
+          {/* FRIENDS */}
+          <Section title="Friends 🌿">
+            {friends.length === 0 ? (
+              <Empty text="No friends yet" />
             ) : (
-              <button
-                onClick={() => sendRequest(u)}
-                className="bg-green-500 text-white px-2 rounded"
-              >
-                Send
-              </button>
+              friends.map((f) => (
+                <Card key={f._id}>
+                  <span className="text-slate-200 font-medium">
+                    {f.name}
+                  </span>
+                  <div className="flex gap-2">
+                    <Btn onClick={() => navigate("/chat")} color="indigo">Chat</Btn>
+                    <Btn onClick={() => unfriend(f)} color="amber">Unfriend</Btn>
+                    <Btn onClick={() => block(f)} color="rose">Block</Btn>
+                  </div>
+                </Card>
+              ))
             )}
-          </div>
-        ))}
-      </div>
+          </Section>
 
-      {/* ===== REQUESTS RECEIVED ===== */}
-      <div className="bg-white p-4 rounded shadow">
-        <h2 className="font-semibold mb-3">Requests Received</h2>
-        {receivedRequests.length === 0 ? (
-          <p>No requests</p>
-        ) : (
-          receivedRequests.map((u) => (
-            <div key={u._id} className="flex justify-between mb-2">
-              <span>{u.name}</span>
-              <div className="flex gap-2">
-                <button
-                  onClick={() => acceptRequest(u)}
-                  className="bg-green-500 text-white px-2 rounded"
-                >
-                  Accept
-                </button>
-                <button
-                  onClick={() => rejectRequest(u)}
-                  className="bg-red-500 text-white px-2 rounded"
-                >
-                  Reject
-                </button>
-              </div>
-            </div>
-          ))
-        )}
-      </div>
+          {/* SEARCH */}
+          <Section title="Find People 🔍">
+            <input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search by name or email"
+              className="w-full mb-4 bg-slate-900/60 border border-slate-700 rounded px-3 py-2 text-slate-200 outline-none"
+            />
 
-      {/* ===== REQUESTS SENT ===== */}
-      <div className="bg-white p-4 rounded shadow">
-        <h2 className="font-semibold mb-3">Requests Sent</h2>
-        {sentRequests.length === 0 ? (
-          <p>No sent requests</p>
-        ) : (
-          sentRequests.map((u) => (
-            <div key={u._id} className="flex justify-between mb-2">
-              <span>{u.name}</span>
-              <button disabled className="bg-gray-300 px-2 rounded">
-                Pending
-              </button>
-            </div>
-          ))
-        )}
-      </div>
+            {searchResults.map((u) => (
+              <Card key={u._id}>
+                <span className="text-slate-200">{u.name}</span>
+                {u._id === currentUserId ? (
+                  <Badge>You</Badge>
+                ) : isFriend(u._id) ? (
+                  <Badge>Friend</Badge>
+                ) : hasSentRequest(u._id) ? (
+                  <Badge>Sent</Badge>
+                ) : hasReceivedRequest(u._id) ? (
+                  <Badge>Received</Badge>
+                ) : (
+                  <Btn onClick={() => sendRequest(u)} color="emerald">
+                    Send
+                  </Btn>
+                )}
+              </Card>
+            ))}
+          </Section>
 
-    </div></div>
+          {/* RECEIVED */}
+          <Section title="Requests Received 📩">
+            {receivedRequests.length === 0 ? (
+              <Empty text="No requests" />
+            ) : (
+              receivedRequests.map((u) => (
+                <Card key={u._id}>
+                  <span className="text-slate-200">{u.name}</span>
+                  <div className="flex gap-2">
+                    <Btn onClick={() => acceptRequest(u)} color="emerald">
+                      Accept
+                    </Btn>
+                    <Btn onClick={() => rejectRequest(u)} color="rose">
+                      Reject
+                    </Btn>
+                  </div>
+                </Card>
+              ))
+            )}
+          </Section>
+
+          {/* SENT */}
+          <Section title="Requests Sent ⏳">
+            {sentRequests.length === 0 ? (
+              <Empty text="No sent requests" />
+            ) : (
+              sentRequests.map((u) => (
+                <Card key={u._id}>
+                  <span className="text-slate-200">{u.name}</span>
+                  <Badge>Pending</Badge>
+                </Card>
+              ))
+            )}
+          </Section>
+
+        </div>
+      </div>
+    </div>
   );
 };
+
+/* ===== SMALL UI COMPONENTS ===== */
+
+const Section = ({ title, children }) => (
+  <div className="rounded-3xl bg-slate-800/70 backdrop-blur-xl border border-slate-700 p-6 shadow-xl">
+    <h2 className="text-xl font-bold text-emerald-300 mb-4">
+      {title}
+    </h2>
+    <div className="space-y-3">{children}</div>
+  </div>
+);
+
+const Card = ({ children }) => (
+  <div className="flex justify-between items-center gap-3 rounded-xl bg-slate-900/60 border border-slate-700 p-3 transition hover:scale-[1.02]">
+    {children}
+  </div>
+);
+
+const Btn = ({ children, onClick, color }) => {
+  const map = {
+    emerald: "bg-emerald-500 hover:bg-emerald-600",
+    indigo: "bg-indigo-500 hover:bg-indigo-600",
+    amber: "bg-amber-500 hover:bg-amber-600",
+    rose: "bg-rose-500 hover:bg-rose-600",
+  };
+
+  return (
+    <button
+      onClick={onClick}
+      className={`px-3 py-1.5 rounded text-sm text-white transition ${map[color]}`}
+    >
+      {children}
+    </button>
+  );
+};
+
+const Badge = ({ children }) => (
+  <span className="px-3 py-1 text-sm rounded bg-slate-700 text-slate-300">
+    {children}
+  </span>
+);
+
+const Empty = ({ text }) => (
+  <p className="text-slate-400">{text}</p>
+);
 
 export default Community;

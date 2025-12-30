@@ -4,7 +4,7 @@ exports.addProductController = async (req, res) => {
   try {
     
     // 1️⃣ Get userId from verifyToken middleware
-    const userId = req.user.userId;
+    const userId = req.user.userId || req.user.id;
     console.log("User ID from token:", userId);
 
     // 2️⃣ Pass body as data

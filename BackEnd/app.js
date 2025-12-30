@@ -123,6 +123,12 @@ const removeFromCartRoute = require("./src/routes/RemoveFromCartRoute")
 // List of Cart Items Route
 const cartItemsRoute = require("./src/routes/CartListRoute")
 
+// List My Products 
+const MyProducts = require("./src/routes/MyProductsRoute");
+
+// Mark Product Sold
+const MarkSold = require("./src/routes/MarkProductAsSoldRoute")
+
 // Use Routes
 app.use("/api", signUpRoute);
 app.use("/api", LoginRoute);
@@ -151,6 +157,9 @@ app.use("/api/products", AllproductListRoute);
 app.use("/api/cart", addToCartRoute);
 app.use("/api/cart", removeFromCartRoute);
 app.use("/api/cart", cartItemsRoute);
+app.use("/api/Myproducts", MyProducts)
+app.use("/api/products", MarkSold);
+
 
 /* attach socket function */
 app.set("chatSocket", require("./src/socket/chat"));
