@@ -27,7 +27,12 @@ const productSchema = new mongoose.Schema(
         default: [78.4867, 17.3850] // Hyderabad, India (lng, lat)
       }
     },
-    images: [String],
+    images: {
+      type: [String],
+      default: [
+        "https://res.cloudinary.com/demo/image/upload/v1690000000/default-product.png"
+      ],
+    },
     owner: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
   },
   { timestamps: true }

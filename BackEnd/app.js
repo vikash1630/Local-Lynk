@@ -132,6 +132,8 @@ const MarkSold = require("./src/routes/MarkProductAsSoldRoute")
 // Edit Profile 
 const EditProfile = require("./src/routes/EditProfileRoute")
 
+console.log()
+
 // Use Routes
 app.use("/api", signUpRoute);
 app.use("/api", LoginRoute);
@@ -164,6 +166,7 @@ app.use("/api/Myproducts", MyProducts)
 app.use("/api/products", MarkSold);
 app.use("/api/EditProfile", EditProfile);
 
+// console.log(process.env.CLOUDINARY_CLOUD_NAME)
 
 /* attach socket function */
 app.set("chatSocket", require("./src/socket/chat"));

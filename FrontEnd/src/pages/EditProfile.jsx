@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import UserNavBar from "../components/UserNavBar";
+import { useNavigate } from "react-router-dom";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -12,12 +13,14 @@ const EditProfile = () => {
     lng: "",
   });
 
+  const [avatarPreview, setAvatarPreview] = useState("");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const navigate = useNavigate();
 
-  /* ================= FETCH PROFILE ================= */
+  /* FETCH PROFILE */
   useEffect(() => {
     const fetchProfile = async () => {
       try {
@@ -34,6 +37,8 @@ const EditProfile = () => {
           lat: data.location?.coordinates?.[1] || "",
           lng: data.location?.coordinates?.[0] || "",
         });
+
+        setAvatarPreview(data.profilePhoto || "");
       } catch {
         setError("Failed to load profile");
       } finally {
@@ -44,9 +49,19 @@ const EditProfile = () => {
     fetchProfile();
   }, []);
 
-  /* ================= HANDLERS ================= */
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  const handleAvatarChange = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setAvatarPreview(reader.result);
+    };
+    reader.readAsDataURL(file);
   };
 
   const handleSubmit = async (e) => {
@@ -62,6 +77,7 @@ const EditProfile = () => {
         location: {
           coordinates: [Number(form.lng), Number(form.lat)],
         },
+        profilePhoto: avatarPreview,
       };
 
       const res = await fetch(`${API_URL}/api/EditProfile/edit`, {
@@ -75,14 +91,14 @@ const EditProfile = () => {
       if (!res.ok) throw new Error(data.message);
 
       setMessage("Profile updated successfully");
+      
     } catch (err) {
-      setError(err.message || "Update failed");
+      setError("Invalid Input !!");
     } finally {
       setSaving(false);
     }
   };
 
-  /* ================= UI ================= */
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-950 via-zinc-900 to-rose-950 text-zinc-300">
@@ -92,98 +108,60 @@ const EditProfile = () => {
   }
 
   return (
-    <div><UserNavBar />
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-950 via-zinc-900 to-rose-950 px-4 relative">
-      {/* subtle glass overlay */}
-      <div className="absolute inset-0 bg-black/20 backdrop-blur-sm" />
+    <div>
+      <UserNavBar />
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-950 via-zinc-900 to-rose-950 px-4">
+        <div className="w-full max-w-xl rounded-2xl bg-black/30 backdrop-blur-xl border border-white/10 p-8 text-zinc-200 shadow-xl">
 
-      {/* Card */}
-      <div className="relative w-full max-w-xl rounded-2xl border border-white/10 bg-black/30 backdrop-blur-xl shadow-xl p-8 text-zinc-200">
-        <h2 className="text-2xl font-semibold text-rose-400 mb-1">
-          Edit Profile
-        </h2>
-        <p className="text-sm text-zinc-400 mb-8">
-          Keep your details sharp and clean
-        </p>
-
-        <form onSubmit={handleSubmit} className="space-y-5">
-          <Field
-            label="Name"
-            name="name"
-            value={form.name}
-            onChange={handleChange}
-          />
-
-          <Field
-            label="Email (cannot be changed)"
-            value={form.email}
-            disabled
-          />
-
-          <Field
-            label="Age"
-            type="number"
-            name="age"
-            min="0"
-            value={form.age}
-            onChange={handleChange}
-          />
-
-          <div className="grid grid-cols-2 gap-4">
-            <Field
-              label="Latitude"
-              name="lat"
-              value={form.lat}
-              onChange={handleChange}
-            />
-            <Field
-              label="Longitude"
-              name="lng"
-              value={form.lng}
-              onChange={handleChange}
-            />
+          {/* PROFILE PHOTO */}
+          <div className="flex justify-center mb-6">
+            <label className="relative w-32 h-32 rounded-full cursor-pointer overflow-hidden border border-white/20 hover:scale-105 transition">
+              <img
+                src={avatarPreview}
+                alt="Profile"
+                className="w-full h-full object-cover"
+              />
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleAvatarChange}
+                className="hidden"
+              />
+            </label>
           </div>
 
-          {/* MESSAGES */}
-          {message && (
-            <p className="text-sm text-emerald-400 border-l-4 border-emerald-500 pl-3">
-              {message}
-            </p>
-          )}
-          {error && (
-            <p className="text-sm text-rose-400 border-l-4 border-rose-500 pl-3">
-              {error}
-            </p>
-          )}
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <Input label="Name" name="name" value={form.name} onChange={handleChange} />
+            <Input label="Email" value={form.email} disabled />
+            <Input label="Age" type="number" name="age" value={form.age} onChange={handleChange} />
 
-          {/* SUBMIT */}
-          <button
-            disabled={saving}
-            className={`w-full mt-4 py-3 rounded-md font-medium transition
-              ${
-                saving
-                  ? "bg-white/10 text-zinc-400 cursor-not-allowed"
-                  : "bg-gradient-to-r from-rose-600 to-rose-700 text-white hover:from-rose-500 hover:to-rose-600"
-              }`}
-          >
-            {saving ? "Saving…" : "Save Changes"}
-          </button>
-        </form>
+            <div className="grid grid-cols-2 gap-3">
+              <Input label="Latitude" name="lat" value={form.lat} onChange={handleChange} />
+              <Input label="Longitude" name="lng" value={form.lng} onChange={handleChange} />
+            </div>
+
+            {message && <p className="text-emerald-400">{message}</p>}
+            {error && <p className="text-rose-400">{error}</p>}
+
+            <button
+              disabled={saving}
+              className="w-full py-3 rounded bg-gradient-to-r from-rose-600 to-rose-700 hover:from-rose-500 hover:to-rose-600 transition"
+            >
+              {saving ? "Saving…" : "Save Changes"}
+            </button>
+          </form>
+        </div>
       </div>
-    </div></div>
+    </div>
   );
 };
 
-/* ===== Field Component ===== */
-const Field = ({ label, ...props }) => (
+const Input = ({ label, ...props }) => (
   <div>
-    <label className="block text-xs uppercase tracking-widest text-zinc-400 mb-2">
-      {label}
-    </label>
+    <label className="text-xs text-zinc-400">{label}</label>
     <input
       {...props}
-      className={`w-full rounded-md bg-black/30 border border-white/20 px-3 py-2 text-zinc-200
-      placeholder-zinc-500 focus:outline-none focus:border-rose-500 transition`}
+      className="w-full bg-black/30 border border-white/20 rounded px-3 py-2 text-zinc-200"
     />
   </div>
 );

@@ -1,28 +1,27 @@
-const addProductService = require("../services/addProductService");
+const addProductService = require("../services/addProductService")
 
 exports.addProductController = async (req, res) => {
   try {
-    
-    // 1️⃣ Get userId from verifyToken middleware
     const userId = req.user.userId || req.user.id;
-    console.log("User ID from token:", userId);
 
-    // 2️⃣ Pass body as data
-    const data = req.body;
-    console.log("Request body data:", data);
+    console.log("FILES:", req.files);
+    console.log("BODY:", req.body);
 
-    if (!data) {
-      console.log("Request body is missing");
-      error.statusCode = 400;
-      return res.status(400).json({ message: "Request body is missing" });
-    }
-    
-    // 3️⃣ Call service correctly
+    // ✅ Extract image URLs from Cloudinary
+    const images = req.files?.map(file => file.path) || [];
+
+    // ✅ Merge body + images
+    const data = {
+      ...req.body,
+      images,
+    };
+
     const result = await addProductService.addProduct(userId, data);
-    console.log("Product added successfully:", result);
+
     res.status(201).json(result);
 
   } catch (error) {
+    console.error("Add Product Error:", error);
     res.status(error.statusCode || 500).json({
       message: error.message || "Something went wrong"
     });

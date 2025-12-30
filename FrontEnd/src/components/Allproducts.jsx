@@ -51,6 +51,7 @@ const Allproducts = () => {
           credentials: "include",
         });
         const data = await res.json();
+        console.log(data)
 
         if (Array.isArray(data.cart)) {
           const map = {};

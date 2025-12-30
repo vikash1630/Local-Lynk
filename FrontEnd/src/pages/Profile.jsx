@@ -2,6 +2,9 @@ import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import UserNavBar from "../components/UserNavBar";
 
+const DEFAULT_PROFILE_PHOTO =
+  "https://res.cloudinary.com/demo/image/upload/v1690000000/default-profile.png";
+
 const Profile = () => {
   const [user, setUser] = useState(null);
   const [friends, setFriends] = useState([]);
@@ -12,7 +15,7 @@ const Profile = () => {
   const API_URL = import.meta.env.VITE_API_URL;
   const navigate = useNavigate();
 
-  /* ================= PROFILE ================= */
+  /* ================= FETCH PROFILE ================= */
   useEffect(() => {
     const fetchProfile = async () => {
       try {
@@ -26,14 +29,14 @@ const Profile = () => {
 
         setUser(data);
       } catch (err) {
-        setError(err.message);
+        setError(err.message || "Failed to load profile");
       }
     };
 
     fetchProfile();
-  }, []);
+  }, [API_URL]);
 
-  /* ================= FRIENDS ================= */
+  /* ================= FETCH FRIENDS ================= */
   useEffect(() => {
     const fetchFriends = async () => {
       try {
@@ -42,100 +45,86 @@ const Profile = () => {
         });
 
         const data = await res.json();
-        if (!res.ok) throw new Error(data.message);
-
-        setFriends(data.friends);
-      } catch (err) {
-        console.error(err.message);
+        if (res.ok) setFriends(data.friends || []);
       } finally {
         setLoading(false);
       }
     };
 
     fetchFriends();
-  }, []);
+  }, [API_URL]);
 
-  /* ================= BLOCKED USERS ================= */
+  /* ================= FETCH BLOCKED USERS ================= */
   useEffect(() => {
-    const fetchBlockedUsers = async () => {
+    const fetchBlocked = async () => {
       try {
         const res = await fetch(`${API_URL}/api/user/blocked`, {
           credentials: "include",
         });
-
         const data = await res.json();
-        if (!res.ok) throw new Error(data.message);
-
-        setBlockedUsers(data.blockedUsers);
-      } catch (err) {
-        console.error(err.message);
-      }
+        if (res.ok) setBlockedUsers(data.blockedUsers || []);
+      } catch {}
     };
 
-    fetchBlockedUsers();
-  }, []);
+    fetchBlocked();
+  }, [API_URL]);
 
   /* ================= ACTIONS ================= */
   const handleUnfriend = async (friendId) => {
     if (!confirm("Unfriend this user?")) return;
+
     await fetch(`${API_URL}/api/user/unfriend/${friendId}`, {
       method: "DELETE",
       credentials: "include",
     });
+
     setFriends((prev) => prev.filter((f) => f._id !== friendId));
   };
 
   const handleBlock = async (friendId) => {
     if (!confirm("Block this user?")) return;
+
     await fetch(`${API_URL}/api/user/block/${friendId}`, {
       method: "POST",
       credentials: "include",
     });
+
     setFriends((prev) => prev.filter((f) => f._id !== friendId));
     setBlockedUsers((prev) => [...prev, { _id: friendId }]);
   };
 
-  const handleUnblock = async (blockedUserId) => {
-    if (!confirm("Unblock this user?")) return;
-    await fetch(`${API_URL}/api/user/unblock/${blockedUserId}`, {
+  const handleUnblock = async (userId) => {
+    await fetch(`${API_URL}/api/user/unblock/${userId}`, {
       method: "POST",
       credentials: "include",
     });
-    setBlockedUsers((prev) =>
-      prev.filter((u) => u._id !== blockedUserId)
-    );
+
+    setBlockedUsers((prev) => prev.filter((u) => u._id !== userId));
   };
 
-  /* ================= UI ================= */
+  /* ================= LOADING / ERROR ================= */
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen text-slate-300">
+      <div className="min-h-screen flex items-center justify-center bg-slate-900 text-slate-400">
         Loading profile…
       </div>
     );
   }
 
-  if (error) {
+  if (error || !user) {
     return (
-      <div className="flex items-center justify-center min-h-screen text-red-400">
-        {error}
+      <div className="min-h-screen flex items-center justify-center bg-slate-900 text-rose-400">
+        {error || "Profile not found"}
       </div>
     );
   }
 
+  /* ================= UI ================= */
   return (
-    <div
-      className="
-        min-h-screen
-        relative
-        overflow-hidden
-        bg-slate-900
-      "
-    >
-      {/* 🔥 MULTI-GRADIENT BACKGROUND LAYERS */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(244,63,94,0.35),transparent_55%)]" />
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom_right,rgba(99,102,241,0.35),transparent_55%)]" />
-      <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-slate-800 to-rose-900/40" />
+    <div className="min-h-screen bg-slate-900 relative overflow-hidden">
+      {/* Background glow */}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(244,63,94,0.25),transparent_55%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom_right,rgba(99,102,241,0.25),transparent_55%)]" />
 
       <div className="relative z-10">
         <UserNavBar />
@@ -143,170 +132,132 @@ const Profile = () => {
         <div className="max-w-5xl mx-auto px-4 py-12 space-y-10">
 
           {/* ===== PROFILE CARD ===== */}
-          <div className="group relative rounded-3xl bg-slate-900/80 backdrop-blur-xl 
-border border-slate-700/60 
-shadow-[0_20px_60px_rgba(0,0,0,0.6)] 
-p-6 sm:p-8 
-transition-all duration-500 
-hover:scale-[1.015] 
-hover:shadow-[0_30px_80px_rgba(244,63,94,0.25)]">
+          <div className="rounded-3xl bg-slate-900/80 backdrop-blur-xl border border-slate-700 p-8 shadow-xl">
 
-            {/* Header */}
-            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-wide 
-  text-transparent bg-clip-text 
-  bg-gradient-to-r from-rose-400 via-pink-400 to-indigo-400">
-              {user.name}
-            </h1>
+            <div className="flex flex-col sm:flex-row gap-6 items-center sm:items-start">
+              {/* PROFILE PHOTO */}
+              <img
+                src={user?.profilePhoto || DEFAULT_PROFILE_PHOTO}
+                alt="Profile"
+                className="w-28 h-28 rounded-full object-cover border-2 border-rose-500/50 shadow-lg"
+              />
 
-            <p className="text-slate-400 mt-1 text-sm break-all">
-              {user.email}
-            </p>
+              <div className="flex-1 text-center sm:text-left">
+                <h1 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-rose-400 to-indigo-400">
+                  {user.name}
+                </h1>
+                <p className="text-slate-400 mt-1 break-all">
+                  {user.email}
+                </p>
 
-            {/* Stats */}
-            <div className="mt-6 grid grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 text-sm">
-              {[
-                ["User ID", user._id],
-                ["Friends", friends.length],
-                ["Joined", new Date(user.createdAt).toLocaleDateString()],
-              ].map(([label, value]) => (
-                <div
-                  key={label}
-                  className="rounded-xl bg-slate-950/70 
-        p-4 border border-slate-700/70 
-        hover:border-rose-500/40 transition-colors"
-                >
-                  <p className="text-slate-400 text-xs mb-1 uppercase tracking-wide">
-                    {label}
-                  </p>
-                  <p className="text-slate-200 font-semibold truncate">
-                    {value}
-                  </p>
+                <div className="mt-6 grid grid-cols-2 sm:grid-cols-3 gap-4 text-sm">
+                  <Stat label="User ID" value={user._id} />
+                  <Stat label="Friends" value={friends.length} />
+                  <Stat
+                    label="Joined"
+                    value={new Date(user.createdAt).toLocaleDateString()}
+                  />
                 </div>
-              ))}
-            </div>
 
-            {/* Edit Button */}
-            <div className="mt-8 flex justify-center">
-              <Link
-                to="/EditProfile"
-                className="inline-flex items-center gap-2 
-      rounded-xl px-5 py-2.5 
-      bg-gradient-to-r from-rose-500 to-pink-500 
-      text-white text-sm font-semibold 
-      shadow-lg shadow-rose-500/30 
-      transition-all duration-300 
-      hover:scale-105 hover:shadow-rose-500/50
-      active:scale-95"
-              >
-                Edit Profile
-              </Link>
+                <div className="mt-6">
+                  <Link
+                    to="/EditProfile"
+                    className="inline-block px-6 py-2.5 rounded-xl bg-gradient-to-r from-rose-500 to-pink-500 text-white font-semibold shadow-lg hover:scale-105 transition"
+                  >
+                    Edit Profile
+                  </Link>
+                </div>
+              </div>
             </div>
-
           </div>
-
 
           {/* ===== FRIENDS ===== */}
-          <div className="rounded-3xl bg-slate-800/70 backdrop-blur-xl border border-slate-700 p-8 shadow-xl">
-            <h2 className="text-xl font-bold text-rose-300 mb-6">
-              Friends
-            </h2>
-
+          <Section title="Friends">
             {friends.length === 0 ? (
-              <p className="text-slate-400">
-                No friends yet
-              </p>
+              <Empty text="No friends yet" />
             ) : (
-              <ul className="space-y-5">
-                {friends.map((friend) => (
-                  <li
-                    key={friend._id}
-                    className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 rounded-xl bg-slate-900/60 border border-slate-700 p-4 transition hover:scale-[1.01]"
-                  >
-                    <div>
-                      <p className="text-slate-200 font-semibold">
-                        {friend.name}
-                      </p>
-                      <p className="text-sm text-slate-400">
-                        {friend.email}
-                      </p>
-                    </div>
-
-                    <div className="flex flex-wrap gap-2">
-                      <button
-                        onClick={() => navigate("/chat")}
-                        className="px-3 py-1.5 rounded bg-indigo-500 text-white text-sm hover:bg-indigo-600 transition"
-                      >
-                        Chat
-                      </button>
-                      <button
-                        onClick={() =>
-                          handleUnfriend(friend._id)
-                        }
-                        className="px-3 py-1.5 rounded bg-amber-500 text-white text-sm hover:bg-amber-600 transition"
-                      >
-                        Unfriend
-                      </button>
-                      <button
-                        onClick={() =>
-                          handleBlock(friend._id)
-                        }
-                        className="px-3 py-1.5 rounded bg-rose-600 text-white text-sm hover:bg-rose-700 transition"
-                      >
-                        Block
-                      </button>
-                    </div>
-                  </li>
-                ))}
-              </ul>
+              friends.map((f) => (
+                <Row key={f._id}>
+                  <UserMini user={f} />
+                  <div className="flex gap-2">
+                    <Btn onClick={() => navigate("/chat")} text="Chat" color="indigo" />
+                    <Btn onClick={() => handleUnfriend(f._id)} text="Unfriend" color="amber" />
+                    <Btn onClick={() => handleBlock(f._id)} text="Block" color="rose" />
+                  </div>
+                </Row>
+              ))
             )}
-          </div>
+          </Section>
 
           {/* ===== BLOCKED USERS ===== */}
-          <div className="rounded-3xl bg-slate-800/70 backdrop-blur-xl border border-slate-700 p-8 shadow-xl">
-            <h2 className="text-xl font-bold text-rose-300 mb-6">
-              Blocked Users
-            </h2>
-
+          <Section title="Blocked Users">
             {blockedUsers.length === 0 ? (
-              <p className="text-slate-400">
-                No blocked users
-              </p>
+              <Empty text="No blocked users" />
             ) : (
-              <ul className="space-y-4">
-                {blockedUsers.map((blocked) => (
-                  <li
-                    key={blocked._id}
-                    className="flex justify-between items-center rounded-xl bg-slate-900/60 border border-slate-700 p-4"
-                  >
-                    <div>
-                      <p className="text-slate-200 font-medium">
-                        {blocked.name || blocked._id}
-                      </p>
-                      {blocked.email && (
-                        <p className="text-xs text-slate-400">
-                          {blocked.email}
-                        </p>
-                      )}
-                    </div>
-
-                    <button
-                      onClick={() =>
-                        handleUnblock(blocked._id)
-                      }
-                      className="px-3 py-1.5 rounded bg-emerald-500 text-white text-sm hover:bg-emerald-600 transition"
-                    >
-                      Unblock
-                    </button>
-                  </li>
-                ))}
-              </ul>
+              blockedUsers.map((u) => (
+                <Row key={u._id}>
+                  <span className="text-slate-300">{u.name || u._id}</span>
+                  <Btn onClick={() => handleUnblock(u._id)} text="Unblock" color="emerald" />
+                </Row>
+              ))
             )}
-          </div>
+          </Section>
 
         </div>
       </div>
     </div>
   );
 };
+
+/* ================= SMALL COMPONENTS ================= */
+
+const Stat = ({ label, value }) => (
+  <div className="rounded-xl bg-slate-950/70 border border-slate-700 p-3">
+    <p className="text-xs text-slate-400 uppercase">{label}</p>
+    <p className="text-slate-200 font-semibold truncate">{value}</p>
+  </div>
+);
+
+const Section = ({ title, children }) => (
+  <div className="rounded-3xl bg-slate-800/70 backdrop-blur-xl border border-slate-700 p-8 shadow-xl">
+    <h2 className="text-xl font-bold text-rose-300 mb-6">{title}</h2>
+    <div className="space-y-4">{children}</div>
+  </div>
+);
+
+const Row = ({ children }) => (
+  <div className="flex flex-col sm:flex-row justify-between items-center gap-4 rounded-xl bg-slate-900/60 border border-slate-700 p-4">
+    {children}
+  </div>
+);
+
+const UserMini = ({ user }) => (
+  <div>
+    <p className="text-slate-200 font-semibold">{user.name}</p>
+    <p className="text-sm text-slate-400">{user.email}</p>
+  </div>
+);
+
+const Btn = ({ text, onClick, color }) => {
+  const colors = {
+    indigo: "bg-indigo-500 hover:bg-indigo-600",
+    amber: "bg-amber-500 hover:bg-amber-600",
+    rose: "bg-rose-600 hover:bg-rose-700",
+    emerald: "bg-emerald-500 hover:bg-emerald-600",
+  };
+
+  return (
+    <button
+      onClick={onClick}
+      className={`px-3 py-1.5 rounded text-white text-sm transition ${colors[color]}`}
+    >
+      {text}
+    </button>
+  );
+};
+
+const Empty = ({ text }) => (
+  <p className="text-slate-400">{text}</p>
+);
 
 export default Profile;

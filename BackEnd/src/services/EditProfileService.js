@@ -7,10 +7,9 @@ exports.editProfile = async (userId, data) => {
     throw error;
   }
 
-  /* ================= BLOCK FORBIDDEN FIELDS ================= */
+  /* ❌ BLOCK FORBIDDEN FIELDS */
   delete data.email;
   delete data.password;
-
   delete data._id;
   delete data.friends;
   delete data.friendRequestsSent;
@@ -23,7 +22,7 @@ exports.editProfile = async (userId, data) => {
   delete data.createdAt;
   delete data.updatedAt;
 
-  /* ================= ALLOW ONLY VALID FIELDS ================= */
+  /* ✅ ALLOWED UPDATES */
   const allowedUpdates = {};
 
   if (typeof data.name === "string") {
@@ -45,15 +44,14 @@ exports.editProfile = async (userId, data) => {
     };
   }
 
-  /* ================= UPDATE USER ================= */
+  if (typeof data.profilePhoto === "string") {
+    allowedUpdates.profilePhoto = data.profilePhoto;
+  }
+
   const updatedUser = await User.findByIdAndUpdate(
     userId,
     { $set: allowedUpdates },
-    {
-      new: true,
-      runValidators: true,
-      select: "-password",
-    }
+    { new: true, runValidators: true, select: "-password" }
   );
 
   if (!updatedUser) {

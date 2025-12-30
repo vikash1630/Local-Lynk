@@ -1,9 +1,12 @@
 const User = require("../models/User");
 const Product = require("../models/Product");
 
+const DEFAULT_PRODUCT_IMAGE =
+  "https://res.cloudinary.com/demo/image/upload/v1690000000/default-product.png";
+
 exports.addProduct = async (userId, data) => {
   try {
-    // 1️⃣ Check if user exists
+    /* 1️⃣ Check user */
     const user = await User.findById(userId);
     if (!user) {
       const error = new Error("User not found");
@@ -11,7 +14,7 @@ exports.addProduct = async (userId, data) => {
       throw error;
     }
 
-    // 2️⃣ Destructure & sanitize input
+    /* 2️⃣ Destructure */
     const {
       name,
       description,
@@ -19,10 +22,10 @@ exports.addProduct = async (userId, data) => {
       quantity = 1,
       lng,
       lat,
-      images = [],
+      images,
     } = data;
 
-    // 3️⃣ Validation
+    /* 3️⃣ Validation */
     if (!name || price === undefined || lng === undefined || lat === undefined) {
       const error = new Error("Name, price, longitude and latitude are required");
       error.statusCode = 400;
@@ -41,14 +44,23 @@ exports.addProduct = async (userId, data) => {
       throw error;
     }
 
-    // 4️⃣ Create product (schema-compliant)
+    /* 4️⃣ Handle images PROPERLY */
+    let finalImages;
+
+    if (Array.isArray(images) && images.length > 0) {
+      finalImages = images;
+    } else {
+      finalImages = [DEFAULT_PRODUCT_IMAGE];
+    }
+
+    /* 5️⃣ Create product */
     const product = await Product.create({
       name: name.trim(),
       description: description?.trim(),
       price,
       quantity,
       status: quantity === 0 ? "sold" : "available",
-      images,
+      images: finalImages,
       owner: user._id,
       location: {
         type: "Point",
@@ -56,13 +68,12 @@ exports.addProduct = async (userId, data) => {
       },
     });
 
-    // 5️⃣ Attach product to user (only if your User model has products[])
+    /* 6️⃣ Attach product to user */
     if (Array.isArray(user.products)) {
       user.products.push(product._id);
       await user.save();
     }
 
-    // 6️⃣ Return response
     return {
       message: "Product added successfully",
       product,

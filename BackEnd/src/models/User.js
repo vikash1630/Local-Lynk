@@ -33,6 +33,10 @@ const userSchema = new mongoose.Schema(
         default: [78.4867, 17.3850] // Hyderabad, India (lng, lat)
       }
     },
+    profilePhoto: {
+      type: String,
+      default: "https://ui-avatars.com/api/?name=User&background=0D8ABC&color=fff"
+    },
     blockedUsers: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
     friendRequestsSent: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
     friendRequestsReceived: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
