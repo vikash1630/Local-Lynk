@@ -28,6 +28,19 @@ exports.addToCartService = async (userId, productId) => {
     throw new Error("Product not found");
   }
 
+  // ❌ Block user from buying their own product
+  // ❌ Block user from buying their own product (SAFE)
+  if (
+    product.owner &&
+    product.owner.toString() === userId.toString()
+  ) {
+    const error = new Error("You cannot add your own product to cart");
+    error.status = 403;
+    throw error;
+  }
+
+
+
   // ❌ Block sold or out-of-stock products
   if (product.status === "sold" || product.quantity === 0) {
     throw new Error("Product out of stock");

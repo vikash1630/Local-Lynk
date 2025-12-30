@@ -129,6 +129,9 @@ const MyProducts = require("./src/routes/MyProductsRoute");
 // Mark Product Sold
 const MarkSold = require("./src/routes/MarkProductAsSoldRoute")
 
+// Edit Profile 
+const EditProfile = require("./src/routes/EditProfileRoute")
+
 // Use Routes
 app.use("/api", signUpRoute);
 app.use("/api", LoginRoute);
@@ -159,6 +162,7 @@ app.use("/api/cart", removeFromCartRoute);
 app.use("/api/cart", cartItemsRoute);
 app.use("/api/Myproducts", MyProducts)
 app.use("/api/products", MarkSold);
+app.use("/api/EditProfile", EditProfile);
 
 
 /* attach socket function */

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import UserNavBar from "../components/UserNavBar";
 
 const Profile = () => {
@@ -143,35 +143,67 @@ const Profile = () => {
         <div className="max-w-5xl mx-auto px-4 py-12 space-y-10">
 
           {/* ===== PROFILE CARD ===== */}
-          <div className="group rounded-3xl bg-slate-800/70 backdrop-blur-xl border border-slate-700 shadow-[0_20px_60px_rgba(0,0,0,0.6)] p-8 transition-all duration-500 hover:scale-[1.015] hover:shadow-[0_30px_80px_rgba(244,63,94,0.25)]">
-            <h1 className="text-3xl font-extrabold tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-rose-400 via-pink-400 to-indigo-400">
+          <div className="group relative rounded-3xl bg-slate-900/80 backdrop-blur-xl 
+border border-slate-700/60 
+shadow-[0_20px_60px_rgba(0,0,0,0.6)] 
+p-6 sm:p-8 
+transition-all duration-500 
+hover:scale-[1.015] 
+hover:shadow-[0_30px_80px_rgba(244,63,94,0.25)]">
+
+            {/* Header */}
+            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-wide 
+  text-transparent bg-clip-text 
+  bg-gradient-to-r from-rose-400 via-pink-400 to-indigo-400">
               {user.name}
             </h1>
-            <p className="text-slate-300 mt-1">{user.email}</p>
 
-            <div className="mt-6 grid grid-cols-2 md:grid-cols-3 gap-6 text-sm">
+            <p className="text-slate-400 mt-1 text-sm break-all">
+              {user.email}
+            </p>
+
+            {/* Stats */}
+            <div className="mt-6 grid grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 text-sm">
               {[
                 ["User ID", user._id],
                 ["Friends", friends.length],
-                [
-                  "Joined",
-                  new Date(user.createdAt).toLocaleDateString(),
-                ],
+                ["Joined", new Date(user.createdAt).toLocaleDateString()],
               ].map(([label, value]) => (
                 <div
                   key={label}
-                  className="rounded-xl bg-slate-900/60 p-4 border border-slate-700"
+                  className="rounded-xl bg-slate-950/70 
+        p-4 border border-slate-700/70 
+        hover:border-rose-500/40 transition-colors"
                 >
-                  <p className="text-slate-400 text-xs mb-1">
+                  <p className="text-slate-400 text-xs mb-1 uppercase tracking-wide">
                     {label}
                   </p>
-                  <p className="text-slate-200 font-medium truncate">
+                  <p className="text-slate-200 font-semibold truncate">
                     {value}
                   </p>
                 </div>
               ))}
             </div>
+
+            {/* Edit Button */}
+            <div className="mt-8 flex justify-center">
+              <Link
+                to="/EditProfile"
+                className="inline-flex items-center gap-2 
+      rounded-xl px-5 py-2.5 
+      bg-gradient-to-r from-rose-500 to-pink-500 
+      text-white text-sm font-semibold 
+      shadow-lg shadow-rose-500/30 
+      transition-all duration-300 
+      hover:scale-105 hover:shadow-rose-500/50
+      active:scale-95"
+              >
+                Edit Profile
+              </Link>
+            </div>
+
           </div>
+
 
           {/* ===== FRIENDS ===== */}
           <div className="rounded-3xl bg-slate-800/70 backdrop-blur-xl border border-slate-700 p-8 shadow-xl">

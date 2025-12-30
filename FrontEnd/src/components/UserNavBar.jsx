@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 
 const UserNavBar = () => {
@@ -6,10 +6,19 @@ const UserNavBar = () => {
   const [suggestions, setSuggestions] = useState([]);
   const [mobileOpen, setMobileOpen] = useState(false);
 
+  // underline animation state
+  const [indicatorStyle, setIndicatorStyle] = useState({
+    width: 0,
+    left: 0,
+  });
+
+  const navRef = useRef(null);
+
   const API_URL = import.meta.env.VITE_API_URL;
   const navigate = useNavigate();
   const location = useLocation();
 
+  /* ---------------- SEARCH SUGGESTIONS ---------------- */
   useEffect(() => {
     const timer = setTimeout(async () => {
       if (!query.trim()) {
@@ -37,6 +46,24 @@ const UserNavBar = () => {
     return () => clearTimeout(timer);
   }, [query, API_URL]);
 
+  /* ---------------- SLIDING UNDERLINE EFFECT ---------------- */
+  useEffect(() => {
+    if (!navRef.current) return;
+
+    const activeLink = navRef.current.querySelector(
+      `[data-path="${location.pathname}"]`
+    );
+
+    if (activeLink) {
+      const { offsetLeft, offsetWidth } = activeLink;
+      setIndicatorStyle({
+        left: offsetLeft,
+        width: offsetWidth,
+      });
+    }
+  }, [location.pathname]);
+
+  /* ---------------- HANDLERS ---------------- */
   const handleSearch = () => {
     if (!query.trim()) return;
     setSuggestions([]);
@@ -67,29 +94,36 @@ const UserNavBar = () => {
       <div className="max-w-[1400px] mx-auto px-4 py-3 flex items-center justify-between">
 
         {/* LEFT LINKS (DESKTOP) */}
-        <div className="hidden md:flex items-center gap-6">
-          {navLinks.map(([label, path]) => {
-            const isActive = location.pathname === path;
-            return (
-              <Link
-                key={path}
-                to={path}
-                className={`relative text-sm font-medium transition ${
-                  isActive
-                    ? "text-rose-400"
-                    : "text-slate-300 hover:text-rose-400"
-                }`}
-              >
-                {label}
-                {isActive && (
-                  <span className="absolute left-0 -bottom-1 h-[2px] w-full bg-rose-500" />
-                )}
-              </Link>
-            );
-          })}
+        <div
+          ref={navRef}
+          className="hidden md:flex items-center gap-6 relative"
+        >
+          {navLinks.map(([label, path]) => (
+            <Link
+              key={path}
+              to={path}
+              data-path={path}
+              className={`text-sm font-medium transition-colors ${
+                location.pathname === path
+                  ? "text-rose-400"
+                  : "text-slate-300 hover:text-rose-400"
+              }`}
+            >
+              {label}
+            </Link>
+          ))}
+
+          {/* SLIDING UNDERLINE */}
+          <span
+            className="absolute -bottom-1 h-[2px] bg-rose-500 rounded-full transition-all duration-300 ease-out"
+            style={{
+              width: indicatorStyle.width,
+              transform: `translateX(${indicatorStyle.left}px)`,
+            }}
+          />
         </div>
 
-        {/* MOBILE MENU BUTTON (≡) */}
+        {/* MOBILE MENU BUTTON */}
         <button
           onClick={() => setMobileOpen(!mobileOpen)}
           className="md:hidden flex flex-col gap-[5px] p-2"
@@ -99,7 +133,7 @@ const UserNavBar = () => {
           <span className="w-6 h-[2px] bg-slate-300" />
         </button>
 
-        {/* SEARCH BAR (ALWAYS VISIBLE) */}
+        {/* SEARCH BAR */}
         <div className="relative w-[320px] mx-4">
           <div className="flex rounded-md overflow-hidden border border-slate-600 focus-within:border-rose-500 transition">
             <input
@@ -142,26 +176,23 @@ const UserNavBar = () => {
         </Link>
       </div>
 
-      {/* MOBILE MENU (LINKS ONLY) */}
+      {/* MOBILE MENU */}
       {mobileOpen && (
         <div className="md:hidden bg-slate-800 border-t border-slate-700 px-4 py-4 space-y-3">
-          {navLinks.map(([label, path]) => {
-            const isActive = location.pathname === path;
-            return (
-              <Link
-                key={path}
-                to={path}
-                onClick={() => setMobileOpen(false)}
-                className={`block text-sm font-medium ${
-                  isActive
-                    ? "text-rose-400 underline"
-                    : "text-slate-300 hover:text-rose-400"
-                }`}
-              >
-                {label}
-              </Link>
-            );
-          })}
+          {navLinks.map(([label, path]) => (
+            <Link
+              key={path}
+              to={path}
+              onClick={() => setMobileOpen(false)}
+              className={`block text-sm font-medium ${
+                location.pathname === path
+                  ? "text-rose-400 underline"
+                  : "text-slate-300 hover:text-rose-400"
+              }`}
+            >
+              {label}
+            </Link>
+          ))}
 
           <Link
             to="/logout"

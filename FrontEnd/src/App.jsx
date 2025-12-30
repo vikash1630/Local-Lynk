@@ -15,6 +15,7 @@ import BuyNow from './pages/BuyNow.jsx';
 import CheckOut from './pages/CheckOut.jsx';
 import Sellproducts from './pages/Sellproducts.jsx';
 import MyProducts from './pages/MyProducts.jsx';
+import EditProfile from './pages/EditProfile.jsx';
 
 
 const App = () => {
@@ -92,7 +93,13 @@ const App = () => {
     {
       path: "/myproducts",
       element: <MyProducts />
-    }
+      // to view ALL products sold 
+    },
+    {
+      path: "/EditProfile",
+      element: <EditProfile />
+      // to edit profile
+    },
   ]);
 
 
