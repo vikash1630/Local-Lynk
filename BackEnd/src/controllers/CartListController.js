@@ -2,7 +2,7 @@ const cartService = require("../services/CartListService")
 
 exports.getCart = async (req, res) => {
   try {
-    const userId = req.user.id; // from auth middleware
+    const userId = req.user.userId || req.user.id;// from auth middleware
 
     const cartItems = await cartService.getCartService(userId);
 

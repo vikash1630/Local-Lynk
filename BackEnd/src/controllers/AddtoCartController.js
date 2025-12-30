@@ -16,8 +16,8 @@ exports.addToCart = async (req, res) => {
     });
   } catch (error) {
     console.error("Add to cart error:", error.message);
-    res.status(500).json({
-      message: "Failed to add to cart",
+    res.status(error.status || 500).json({
+      message: error.message || "Failed to add to cart",
     });
   }
 };

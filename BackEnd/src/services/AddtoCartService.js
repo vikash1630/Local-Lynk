@@ -6,14 +6,14 @@ const Product = require("../models/Product");
 exports.addToCartService = async (userId, productId) => {
   // 1️⃣ Validate inputs
   if (!userId || !productId) {
-    throw new Error("userId and productId are required");
+    throw new Error("user or product not found");
   }
 
   if (
     !mongoose.Types.ObjectId.isValid(userId) ||
     !mongoose.Types.ObjectId.isValid(productId)
   ) {
-    throw new Error("Invalid userId or productId");
+    throw new Error("Invalid user or product");
   }
 
   // 2️⃣ Check user
@@ -28,21 +28,32 @@ exports.addToCartService = async (userId, productId) => {
     throw new Error("Product not found");
   }
 
-  // Optional: block adding sold products
-  if (product.status === "sold") {
-    throw new Error("Product already sold");
+  // ❌ Block sold or out-of-stock products
+  if (product.status === "sold" || product.quantity === 0) {
+    throw new Error("Product out of stock");
   }
 
   // 4️⃣ Check if product already in cart
   const itemIndex = user.cart.findIndex(
-    (item) => item.product.toString() === productId
+    (item) => item.product.toString() === productId.toString()
   );
 
   if (itemIndex > -1) {
-    // Increment quantity
+    const currentQty = user.cart[itemIndex].quantity;
+
+    // ❌ STOCK LIMIT CHECK
+    if (currentQty + 2 > product.quantity) {
+      throw new Error("Requested quantity exceeds available stock");
+    }
+
     user.cart[itemIndex].quantity += 1;
   } else {
-    // Add new item
+    // New item
+    if (product.quantity < 1) {
+      error.statur = 400;
+      throw new Error("Product out of stock");
+    }
+
     user.cart.push({
       product: productId,
       quantity: 1,
