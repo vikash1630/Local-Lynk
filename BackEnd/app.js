@@ -138,6 +138,9 @@ const BuyNow = require("./src/routes/buyNowRoute")
 // My Orders
 const MyOrders = require("./src/routes/myOrdersRoute")
 
+// Buy Whole Cart
+const CheckOut = require("./src/routes/CheckOutRoute")
+
 console.log()
 
 // Use Routes
@@ -173,6 +176,7 @@ app.use("/api/products", MarkSold);
 app.use("/api/EditProfile", EditProfile);
 app.use("/api/orders" , BuyNow)
 app.use("/api/orders" , MyOrders)
+app.use("/api/checkOut", CheckOut)
 
 // console.log(process.env.CLOUDINARY_CLOUD_NAME)
 

@@ -59,6 +59,7 @@ exports.buyNow = async ({ buyerId, productId }) => {
     item: product._id,
     quantity: 1,
     price: product.price,
+    status: "confirmed",
   });
 
   // ✅ ONLY buyer gets order reference

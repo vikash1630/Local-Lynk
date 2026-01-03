@@ -55,7 +55,7 @@ exports.addToCartService = async (userId, productId) => {
     const currentQty = user.cart[itemIndex].quantity;
 
     // ❌ STOCK LIMIT CHECK
-    if (currentQty + 2 > product.quantity) {
+    if (currentQty + 1 > product.quantity) {
       throw new Error("Requested quantity exceeds available stock");
     }
 

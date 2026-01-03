@@ -67,7 +67,7 @@ const App = () => {
       // to view community page
     },
     {
-      path: "/chat",
+      path: "/chat/:friendId",
       element: <Chat />
       // to view chat page
     },

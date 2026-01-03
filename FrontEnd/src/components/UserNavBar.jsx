@@ -6,7 +6,6 @@ const UserNavBar = () => {
   const [suggestions, setSuggestions] = useState([]);
   const [mobileOpen, setMobileOpen] = useState(false);
 
-  // underline animation state
   const [indicatorStyle, setIndicatorStyle] = useState({
     width: 0,
     left: 0,
@@ -32,12 +31,10 @@ const UserNavBar = () => {
           {
             method: "GET",
             credentials: "include",
-            headers: { "Content-Type": "application/json" },
           }
         );
-
         const data = await res.json();
-        setSuggestions(data);
+        setSuggestions(Array.isArray(data) ? data : []);
       } catch {
         setSuggestions([]);
       }
@@ -46,7 +43,7 @@ const UserNavBar = () => {
     return () => clearTimeout(timer);
   }, [query, API_URL]);
 
-  /* ---------------- SLIDING UNDERLINE EFFECT ---------------- */
+  /* ---------------- SLIDING UNDERLINE ---------------- */
   useEffect(() => {
     if (!navRef.current) return;
 
@@ -55,12 +52,32 @@ const UserNavBar = () => {
     );
 
     if (activeLink) {
-      const { offsetLeft, offsetWidth } = activeLink;
       setIndicatorStyle({
-        left: offsetLeft,
-        width: offsetWidth,
+        left: activeLink.offsetLeft,
+        width: activeLink.offsetWidth,
       });
     }
+  }, [location.pathname]);
+
+  /* ---------------- RESIZE FIX ---------------- */
+  useEffect(() => {
+    const handleResize = () => {
+      if (!navRef.current) return;
+
+      const activeLink = navRef.current.querySelector(
+        `[data-path="${location.pathname}"]`
+      );
+
+      if (activeLink) {
+        setIndicatorStyle({
+          left: activeLink.offsetLeft,
+          width: activeLink.offsetWidth,
+        });
+      }
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, [location.pathname]);
 
   /* ---------------- HANDLERS ---------------- */
@@ -70,14 +87,14 @@ const UserNavBar = () => {
     navigate(`/products?search=${encodeURIComponent(query)}`);
   };
 
-  const handleSuggestionClick = (productId) => {
-    setSuggestions([]);
-    setQuery("");
-    navigate(`/product/${productId}`);
-  };
-
   const handleKeyDown = (e) => {
     if (e.key === "Enter") handleSearch();
+  };
+
+  const handleSuggestionClick = (id) => {
+    setSuggestions([]);
+    setQuery("");
+    navigate(`/product/${id}`);
   };
 
   const navLinks = [
@@ -87,17 +104,37 @@ const UserNavBar = () => {
     ["Community", "/community"],
     ["My Cart", "/my-cart"],
     ["My Products", "/myproducts"],
-    ["My Orders", "/MyOrders"]
+    ["My Orders", "/MyOrders"],
   ];
 
   return (
-    <nav className="sticky top-0 z-50 bg-slate-800 border-b border-rose-900/40">
-      <div className="max-w-[1400px] mx-auto px-4 py-3 flex items-center justify-between">
+    <nav className="sticky top-0 z-50 bg-slate-900 border-b border-rose-900/40">
+      <div className="max-w-[1400px] mx-auto px-3 py-2 flex items-center gap-3">
 
-        {/* LEFT LINKS (DESKTOP) */}
+        {/* MOBILE MENU BUTTON */}
+        <button
+          onClick={() => setMobileOpen(!mobileOpen)}
+          className="md:hidden flex flex-col gap-[5px] p-2 rounded-md hover:bg-slate-800 transition"
+        >
+          <span className="w-6 h-[2px] bg-slate-300" />
+          <span className="w-6 h-[2px] bg-slate-300" />
+          <span className="w-6 h-[2px] bg-slate-300" />
+        </button>
+
+        {/* APP LOGO */}
+        <Link to="/home" className="flex items-center gap-2">
+          <div className="w-9 h-9 rounded-full bg-gradient-to-br from-rose-500 to-fuchsia-500 flex items-center justify-center text-sm font-bold text-white">
+            LL
+          </div>
+          <span className="text-base font-semibold text-rose-400">
+            LocalLynk
+          </span>
+        </Link>
+
+        {/* DESKTOP NAV LINKS */}
         <div
           ref={navRef}
-          className="hidden md:flex items-center gap-6 relative"
+          className="hidden md:flex items-center gap-6 relative ml-8"
         >
           {navLinks.map(([label, path]) => (
             <Link
@@ -114,28 +151,17 @@ const UserNavBar = () => {
             </Link>
           ))}
 
-          {/* SLIDING UNDERLINE */}
           <span
-            className="absolute -bottom-1 h-[2px] bg-rose-500 rounded-full transition-all duration-300 ease-out"
+            className="absolute -bottom-1 h-[2px] bg-rose-500 rounded-full transition-all duration-300 ease-in-out"
             style={{
               width: indicatorStyle.width,
-              transform: `translateX(${indicatorStyle.left}px)`,
+              left: indicatorStyle.left,
             }}
           />
         </div>
 
-        {/* MOBILE MENU BUTTON */}
-        <button
-          onClick={() => setMobileOpen(!mobileOpen)}
-          className="md:hidden flex flex-col gap-[5px] p-2"
-        >
-          <span className="w-6 h-[2px] bg-slate-300" />
-          <span className="w-6 h-[2px] bg-slate-300" />
-          <span className="w-6 h-[2px] bg-slate-300" />
-        </button>
-
         {/* SEARCH BAR */}
-        <div className="relative w-[320px] mx-4">
+        <div className="relative ml-auto w-full md:w-[320px] max-w-[260px]">
           <div className="flex rounded-md overflow-hidden border border-slate-600 focus-within:border-rose-500 transition">
             <input
               type="text"
@@ -143,18 +169,18 @@ const UserNavBar = () => {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               onKeyDown={handleKeyDown}
-              className="flex-1 px-3 py-2 text-sm bg-slate-700 text-slate-200 placeholder-slate-400 outline-none"
+              className="flex-1 px-2 py-2 text-sm bg-slate-800 text-slate-200 placeholder-slate-400 outline-none"
             />
             <button
               onClick={handleSearch}
-              className="px-4 bg-rose-600 text-white text-sm hover:bg-rose-700 transition"
+              className="px-3 bg-rose-600 text-white text-sm hover:bg-rose-700 transition"
             >
               Search
             </button>
           </div>
 
           {suggestions.length > 0 && (
-            <ul className="absolute mt-1 w-full bg-slate-700 border border-slate-600 rounded shadow z-50">
+            <ul className="absolute mt-1 w-full bg-slate-800 border border-slate-700 rounded shadow z-50">
               {suggestions.map((item) => (
                 <li
                   key={item._id}
@@ -171,7 +197,7 @@ const UserNavBar = () => {
         {/* LOGOUT (DESKTOP) */}
         <Link
           to="/logout"
-          className="hidden md:block text-sm font-medium text-rose-400 hover:text-rose-500 transition"
+          className="hidden md:block ml-6 text-sm font-medium text-rose-400 hover:text-rose-500 transition"
         >
           Logout
         </Link>
@@ -179,13 +205,13 @@ const UserNavBar = () => {
 
       {/* MOBILE MENU */}
       {mobileOpen && (
-        <div className="md:hidden bg-slate-800 border-t border-slate-700 px-4 py-4 space-y-3">
+        <div className="md:hidden bg-slate-900 border-t border-slate-800 px-4 py-4 space-y-4 transition-all duration-200">
           {navLinks.map(([label, path]) => (
             <Link
               key={path}
               to={path}
               onClick={() => setMobileOpen(false)}
-              className={`block text-sm font-medium ${
+              className={`block text-sm font-medium py-2 ${
                 location.pathname === path
                   ? "text-rose-400 underline"
                   : "text-slate-300 hover:text-rose-400"
@@ -198,7 +224,7 @@ const UserNavBar = () => {
           <Link
             to="/logout"
             onClick={() => setMobileOpen(false)}
-            className="block text-sm font-medium text-rose-500 pt-2"
+            className="block text-sm font-medium text-rose-500 pt-3"
           >
             Logout
           </Link>

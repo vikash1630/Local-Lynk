@@ -187,7 +187,7 @@ const Community = () => {
                     {f.name}
                   </span>
                   <div className="flex gap-2">
-                    <Btn onClick={() => navigate("/chat")} color="indigo">Chat</Btn>
+                    <Btn onClick={() => navigate(`/chat/${f._id}`)} color="indigo">Chat</Btn>
                     <Btn onClick={() => unfriend(f)} color="amber">Unfriend</Btn>
                     <Btn onClick={() => block(f)} color="rose">Block</Btn>
                   </div>

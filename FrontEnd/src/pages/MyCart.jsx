@@ -160,7 +160,7 @@ const MyCart = () => {
                 Your cart is empty
               </p>
               <button
-                onClick={() => navigate("/home")}
+                onClick={() => navigate("/Products")}
                 className="px-8 py-3 rounded-xl bg-cyan-500 text-slate-900 font-semibold hover:bg-cyan-400 transition"
               >
                 Browse Products

@@ -4,7 +4,6 @@ import UserNavBar from "../components/UserNavBar";
 
 const BuyNow = () => {
   const { id: productId } = useParams();
-  console.log(productId)
   const navigate = useNavigate();
 
   const [product, setProduct] = useState(null);
@@ -12,7 +11,6 @@ const BuyNow = () => {
   const [placingOrder, setPlacingOrder] = useState(false);
   const [error, setError] = useState("");
   const [orderSuccess, setOrderSuccess] = useState(false);
-
 
   const API_URL = import.meta.env.VITE_API_URL;
 
@@ -33,7 +31,7 @@ const BuyNow = () => {
         const data = await res.json();
         if (!res.ok) throw new Error(data.message);
 
-        setProduct(data); // ✅ FIX
+        setProduct(data);
       } catch (err) {
         setError(err.message || "Failed to load product");
       } finally {
@@ -41,9 +39,8 @@ const BuyNow = () => {
       }
     };
 
-
     fetchProduct();
-  }, [API_URL, productId]);
+  }, [API_URL, productId, navigate]);
 
   /* ---------------- PLACE ORDER ---------------- */
   const placeOrder = async () => {
@@ -62,11 +59,7 @@ const BuyNow = () => {
       const data = await res.json();
       if (!res.ok) throw new Error(data.message);
 
-      // ✅ SHOW SUCCESS SCREEN
       setOrderSuccess(true);
-
-      // ✅ Replace history so BACK doesn't return here
-      navigate("/MyOrders", { replace: true });
     } catch (err) {
       setError(err.message || "Failed to place order");
     } finally {
@@ -74,12 +67,17 @@ const BuyNow = () => {
     }
   };
 
-
+  /* ---------------- HISTORY CONTROL ---------------- */
+  useEffect(() => {
+    if (orderSuccess) {
+      window.history.replaceState(null, "", "/home");
+    }
+  }, [orderSuccess]);
 
   /* ---------------- LOADING ---------------- */
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center text-slate-400 animate-pulse bg-slate-900">
+      <div className="min-h-screen flex items-center justify-center bg-slate-950 text-cyan-400 animate-pulse">
         Loading product…
       </div>
     );
@@ -88,30 +86,31 @@ const BuyNow = () => {
   /* ---------------- PRODUCT NOT FOUND ---------------- */
   if (!product) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-900 text-rose-400">
+      <div className="min-h-screen flex items-center justify-center bg-slate-950 text-rose-400">
         Product not found
       </div>
     );
   }
 
+  /* ---------------- SUCCESS SCREEN ---------------- */
   if (orderSuccess) {
     return (
-      <div className="min-h-screen bg-slate-900">
+      <div className="min-h-screen bg-slate-950">
         <UserNavBar />
 
         <div className="flex flex-col items-center justify-center min-h-[80vh] text-center px-4">
-          <div className="rounded-2xl border border-emerald-500/40 bg-emerald-500/10 px-8 py-10 shadow-xl">
-            <h1 className="text-3xl font-bold text-emerald-400 mb-4">
-              ✅ Order Placed Successfully
+          <div className="rounded-2xl border border-cyan-400/40 bg-cyan-400/10 px-10 py-12 shadow-[0_0_40px_rgba(34,211,238,0.25)]">
+            <h1 className="text-3xl font-extrabold text-cyan-400 mb-4 tracking-wide">
+              ☯ ORDER DOMINATED
             </h1>
 
             <p className="text-slate-300 mb-8">
-              Your order has been placed and is being processed.
+              Your order has been accepted into the system.
             </p>
 
             <button
-              onClick={() => navigate("/my-orders")}
-              className="px-8 py-3 rounded-xl bg-emerald-500 text-slate-900 font-semibold hover:bg-emerald-400 transition"
+              onClick={() => navigate("/MyOrders")}
+              className="px-8 py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-fuchsia-500 text-slate-900 font-bold hover:opacity-90 transition"
             >
               View My Orders
             </button>
@@ -121,20 +120,19 @@ const BuyNow = () => {
     );
   }
 
-
-
+  /* ---------------- MAIN UI ---------------- */
   return (
-    <div className="min-h-screen bg-slate-900 relative overflow-hidden">
-      {/* 🌫️ HASHIRA MIST */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(34,211,238,0.25),transparent_55%)]" />
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom,rgba(251,146,60,0.18),transparent_60%)]" />
+    <div className="min-h-screen bg-slate-950 relative overflow-hidden">
+      {/* 🔮 AKAZA ENERGY */}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(34,211,238,0.35),transparent_55%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom,rgba(217,70,239,0.35),transparent_60%)]" />
 
       <div className="relative z-10">
         <UserNavBar />
 
         <div className="max-w-5xl mx-auto px-4 py-12">
-          <h1 className="text-3xl font-bold text-slate-100 mb-8">
-            🧾 Review & Place Order
+          <h1 className="text-3xl font-extrabold text-cyan-400 mb-8 tracking-wide">
+            🧾 REVIEW & EXECUTE
           </h1>
 
           {/* ERROR */}
@@ -145,15 +143,13 @@ const BuyNow = () => {
           )}
 
           {/* PRODUCT CARD */}
-          <div className="flex flex-col md:flex-row gap-8 rounded-2xl border border-slate-700 bg-slate-800/70 backdrop-blur-xl p-6 shadow-xl">
-            {/* IMAGE */}
+          <div className="flex flex-col md:flex-row gap-8 rounded-2xl border border-slate-800 bg-slate-900/80 backdrop-blur-xl p-6 shadow-2xl">
             <img
               src={product.images?.[0] || "/placeholder.png"}
               alt={product.name}
               className="w-full md:w-64 h-64 object-cover rounded-xl"
             />
 
-            {/* DETAILS */}
             <div className="flex-1">
               <h2 className="text-2xl font-semibold text-slate-100">
                 {product.name}
@@ -163,7 +159,7 @@ const BuyNow = () => {
                 {product.description}
               </p>
 
-              <p className="mt-4 text-3xl font-bold text-amber-400">
+              <p className="mt-4 text-3xl font-extrabold text-fuchsia-500">
                 ₹{product.price}
               </p>
 
@@ -171,12 +167,11 @@ const BuyNow = () => {
                 Available Quantity: {product.quantity}
               </p>
 
-              {product.status === "sold" ||
-                product.quantity === 0 ? (
+              {(product.status === "sold" || product.quantity === 0) && (
                 <p className="mt-2 text-sm text-rose-400">
                   Product is out of stock
                 </p>
-              ) : null}
+              )}
             </div>
           </div>
 
@@ -189,14 +184,15 @@ const BuyNow = () => {
                 product.status === "sold"
               }
               onClick={placeOrder}
-              className={`px-10 py-3 rounded-xl font-semibold transition shadow-lg ${placingOrder ||
+              className={`px-12 py-3 rounded-xl font-extrabold tracking-wide transition shadow-xl ${
+                placingOrder ||
                 product.quantity === 0 ||
                 product.status === "sold"
-                ? "bg-slate-600 text-slate-300 cursor-not-allowed"
-                : "bg-amber-500 text-slate-900 hover:bg-amber-400"
-                }`}
+                  ? "bg-slate-700 text-slate-400 cursor-not-allowed"
+                  : "bg-gradient-to-r from-cyan-500 to-fuchsia-500 text-slate-900 hover:opacity-90"
+              }`}
             >
-              {placingOrder ? "Placing Order…" : "Place Order"}
+              {placingOrder ? "EXECUTING…" : "PLACE ORDER"}
             </button>
           </div>
         </div>

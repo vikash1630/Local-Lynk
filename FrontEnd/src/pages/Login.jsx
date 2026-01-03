@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { GoogleLogin } from "@react-oauth/google";
 
-
 const Login = () => {
   const navigate = useNavigate();
 
@@ -13,50 +12,53 @@ const Login = () => {
 
   const API_URL = import.meta.env.VITE_API_URL;
 
+  /* ---------------- GOOGLE LOGIN ---------------- */
   const handleGoogleLogin = async (googleToken) => {
     try {
-      await fetch(`${API_URL}/api/google`, {
+      const res = await fetch(`${API_URL}/api/google`, {
         method: "POST",
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
         },
         credentials: "include",
-        body: JSON.stringify({ token: googleToken })
+        body: JSON.stringify({ token: googleToken }),
       });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.message || "Google login failed");
+      }
 
       navigate("/home");
     } catch (err) {
-      setError("Google login failed");
+      setError(err.message);
     }
   };
 
-
+  /* ---------------- EMAIL LOGIN ---------------- */
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
     setLoading(true);
 
     try {
-      const response = await fetch(`${API_URL}/api/login`, {
+      const res = await fetch(`${API_URL}/api/login`, {
         method: "POST",
-        credentials: "include", // 🔑 IMPORTANT
+        credentials: "include",
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email, password })
+        body: JSON.stringify({ email, password }),
       });
 
-      const data = await response.json();
+      const data = await res.json();
 
-      if (!response.ok) {
+      if (!res.ok) {
         throw new Error(data.message || "Login failed");
       }
 
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("user", JSON.stringify(data.user));
-
       navigate("/home");
-
     } catch (err) {
       setError(err.message);
     } finally {
@@ -109,11 +111,12 @@ const Login = () => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full rounded-md bg-blue-600 py-2 text-sm font-semibold text-white hover:bg-blue-700 transition disabled:cursor-not-allowed disabled:opacity-70"
+            className="w-full rounded-md bg-blue-600 py-2 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-70"
           >
             {loading ? "Logging in..." : "Login"}
           </button>
         </form>
+
         <p className="mt-6 text-center text-sm text-gray-600">
           Don’t have an account?{" "}
           <button
@@ -123,20 +126,19 @@ const Login = () => {
           >
             Sign Up
           </button>
-
-          <div className="mt-4 flex justify-center">
-            <GoogleLogin
-              onSuccess={(credentialResponse) => {
-                handleGoogleLogin(credentialResponse.credential);
-              }}
-              onError={() => {
-                setError("Google login failed");
-              }}
-            />
-          </div>
-
         </p>
 
+        {/* GOOGLE LOGIN */}
+        <div className="mt-4 flex justify-center">
+          <GoogleLogin
+            onSuccess={(res) =>
+              handleGoogleLogin(res.credential)
+            }
+            onError={() =>
+              setError("Google login failed")
+            }
+          />
+        </div>
       </div>
     </div>
   );
