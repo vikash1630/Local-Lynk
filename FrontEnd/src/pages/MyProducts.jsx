@@ -145,11 +145,10 @@ const MyProducts = () => {
                           markAsSold(product._id);
                       }}
                       className={`rounded-full px-3 py-1 text-xs font-medium tracking-wide
-                      ${
-                        product.status === "available"
+                      ${product.status === "available"
                           ? "bg-slate-800 text-slate-200 hover:bg-slate-700"
                           : "bg-slate-900 text-slate-500 cursor-not-allowed"
-                      }`}
+                        }`}
                     >
                       {product.status === "available" ? "AVAILABLE" : "SOLD"}
                     </span>
@@ -193,7 +192,12 @@ const MyProducts = () => {
 
                     {product.status === "available" && (
                       <p className="mt-3 text-xs text-slate-500 italic">
-                        Tap on status to mark as sold
+                        Tap on <span className="relative font-semibold text-emerald-400">
+                          "AVAILABLE"
+                          <span className="absolute left-0 -bottom-0.5 h-[2px] w-full bg-emerald-400 opacity-70 animate-pulse"></span>
+                        </span>
+                        <span>    </span>
+                        to mark as sold
                       </p>
                     )}
                   </div>
