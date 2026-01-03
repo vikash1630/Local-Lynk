@@ -167,53 +167,47 @@ const Products = () => {
 
           {/* PRODUCTS GRID */}
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {products.map((product) => {
-              const isInCart = cartProductIds.has(product._id);
-              const isMyProduct = myProductIds.has(product._id);
+            {products
+              .filter((product) => !myProductIds.has(product._id)) // 🔥 HIDE MY PRODUCTS
+              .map((product) => {
+                const isInCart = cartProductIds.has(product._id);
 
-              return (
-                <div
-                  key={product._id}
-                  onClick={() => navigate(`/product/${product._id}`)}
-                  className="group rounded-2xl bg-slate-800/70 backdrop-blur-xl border border-slate-700 p-4 cursor-pointer shadow-lg transition-all duration-300 hover:scale-[1.04] hover:shadow-[0_30px_80px_rgba(244,63,94,0.25)]"
-                >
-                  <img
-                    src={product.images?.[0] || "/placeholder.png"}
-                    alt={product.name}
-                    className="h-40 w-full object-cover rounded-xl"
-                  />
+                return (
+                  <div
+                    key={product._id}
+                    onClick={() => navigate(`/product/${product._id}`)}
+                    className="group flex flex-col rounded-2xl bg-slate-800/70 backdrop-blur-xl border border-slate-700 p-4 cursor-pointer shadow-lg transition-all duration-300 hover:scale-[1.03] hover:shadow-[0_30px_80px_rgba(244,63,94,0.25)]"
+                  >
+                    {/* IMAGE */}
+                    <img
+                      src={product.images?.[0] || "/placeholder.png"}
+                      alt={product.name}
+                      className="h-40 w-full object-cover rounded-xl"
+                    />
 
-                  <h3 className="mt-3 text-lg font-semibold text-slate-200">
-                    {product.name}
-                  </h3>
+                    {/* CONTENT */}
+                    <div className="flex flex-col flex-1 mt-3">
+                      <h3 className="text-lg font-semibold text-slate-200 line-clamp-1">
+                        {product.name}
+                      </h3>
 
-                  <p className="text-sm text-slate-400 mt-1 line-clamp-2">
-                    {product.description}
-                  </p>
+                      <p className="text-sm text-slate-400 mt-1 line-clamp-2">
+                        {product.description}
+                      </p>
 
-                  <p className="text-xl font-bold text-orange-400 mt-2">
-                    ₹{product.price}
-                  </p>
+                      <p className="text-xl font-bold text-orange-400 mt-2">
+                        ₹{product.price}
+                      </p>
 
-                  {/* ACTIONS */}
-                  <div className="flex gap-3 mt-4">
-                    {isMyProduct ? (
-                      <button
-                        disabled
-                        className="w-full py-2 rounded text-sm font-semibold bg-indigo-600/70 text-white cursor-not-allowed"
-                      >
-                        Sold by You
-                      </button>
-                    ) : (
-                      <>
+                      {/* ACTIONS (PINNED TO BOTTOM) */}
+                      <div className="flex gap-3 mt-auto pt-4">
                         <button
                           onClick={(e) => addToCart(e, product._id)}
                           disabled={isInCart}
-                          className={`flex-1 py-2 rounded text-sm font-medium transition ${
-                            isInCart
+                          className={`flex-1 py-2 rounded text-sm font-medium transition ${isInCart
                               ? "bg-slate-600 cursor-not-allowed text-slate-300"
                               : "bg-gradient-to-r from-rose-500 to-pink-500 hover:from-rose-600 hover:to-pink-600 text-white"
-                          }`}
+                            }`}
                         >
                           {isInCart ? "Already In Cart" : "Add to Cart"}
                         </button>
@@ -224,13 +218,14 @@ const Products = () => {
                         >
                           Buy Now
                         </button>
-                      </>
-                    )}
+                      </div>
+                    </div>
                   </div>
-                </div>
-              );
-            })}
+
+                );
+              })}
           </div>
+
         </div>
       </div>
     </div>

@@ -12,6 +12,8 @@ const ProductDetails = () => {
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [cartError, setCartError] = useState("");
+
 
   /* ================= USER / FRIEND STATE ================= */
   const [currentUserId, setCurrentUserId] = useState(null);
@@ -30,6 +32,7 @@ const ProductDetails = () => {
       try {
         const res = await fetch(`${API_URL}/api/product/${id}`);
         const data = await res.json();
+        // console.log(data)
         if (!res.ok) throw new Error(data.message || "Failed to load product");
         if (!ignore) setProduct(data);
       } catch (err) {
@@ -70,7 +73,7 @@ const ProductDetails = () => {
           c.cart.forEach(i => map[i.product._id] = true);
           setAddedToCart(map);
         }
-      } catch {}
+      } catch { }
     };
 
     init();
@@ -113,13 +116,28 @@ const ProductDetails = () => {
   };
 
   const addToCart = async () => {
-    if (addedToCart[product._id]) return;
-    await fetch(`${API_URL}/api/cart/add/${product._id}`, {
-      method: "POST",
-      credentials: "include",
-    });
-    setAddedToCart(p => ({ ...p, [product._id]: true }));
+    if (!product?._id) return;
+
+    setCartError("");
+
+    try {
+      const res = await fetch(`${API_URL}/api/cart/add/${product._id}`, {
+        method: "POST",
+        credentials: "include",
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.message || "Failed to add to cart");
+      }
+
+      setAddedToCart(p => ({ ...p, [product._id]: true }));
+    } catch (err) {
+      setCartError(err.message);
+    }
   };
+
 
   const buyNow = () => navigate(`/buy-now/${product._id}`);
 
@@ -133,6 +151,9 @@ const ProductDetails = () => {
   const owner = product.owner;
   const ownerId = owner?._id;
   const isSelf = ownerId === currentUserId;
+  const outOfStock = product.status === "sold" || product.quantity === 0;
+
+
 
   /* ================= UI ================= */
   return (
@@ -166,6 +187,28 @@ const ProductDetails = () => {
               ₹{product.price}
             </p>
 
+            {/* AVAILABLE QUANTITY */}
+            <div className="flex items-center gap-3">
+              <span className="text-xs tracking-widest text-zinc-400 uppercase">
+                Stock
+              </span>
+
+              <span
+                className={`px-4 py-1.5 rounded-full text-sm font-semibold border backdrop-blur-md shadow-md
+      ${outOfStock
+                    ? "bg-rose-500/20 border-rose-500/40 text-rose-300 shadow-rose-500/30"
+                    : product.quantity <= 3
+                      ? "bg-amber-500/20 border-amber-500/40 text-amber-300 shadow-amber-500/30"
+                      : "bg-emerald-500/20 border-emerald-500/40 text-emerald-300 shadow-emerald-500/30"
+                  }`}
+              >
+                {outOfStock
+                  ? "Out of Stock ☠️"
+                  : `${product.quantity} left ⚔️`}
+              </span>
+            </div>
+
+
             <p className="text-sm text-zinc-400 leading-relaxed">
               {product.description}
             </p>
@@ -181,15 +224,26 @@ const ProductDetails = () => {
               <div className="flex flex-col sm:flex-row gap-4 pt-2">
                 <button
                   onClick={addToCart}
-                  disabled={addedToCart[product._id]}
+                  disabled={addedToCart[product._id] || outOfStock}
                   className={`flex-1 py-3 rounded-xl font-medium transition-all duration-300
-                    ${addedToCart[product._id]
+    ${addedToCart[product._id] || outOfStock
                       ? "bg-white/10 text-zinc-400 cursor-not-allowed"
                       : "bg-gradient-to-r from-emerald-500 to-emerald-600 hover:scale-[1.03] hover:shadow-lg hover:shadow-emerald-500/30"
                     }`}
                 >
-                  {addedToCart[product._id] ? "Added to Cart" : "Add to Cart"}
+                  {outOfStock
+                    ? "Out of Stock"
+                    : addedToCart[product._id]
+                      ? "Added to Cart"
+                      : "Add to Cart"}
                 </button>
+
+                {cartError && (
+                  <div className="rounded-xl bg-rose-500/15 border border-rose-500/30 px-4 py-2 text-sm text-rose-300">
+                    {cartError}
+                  </div>
+                )}
+
 
                 <button
                   onClick={buyNow}

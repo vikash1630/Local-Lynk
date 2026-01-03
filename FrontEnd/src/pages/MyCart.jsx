@@ -24,8 +24,28 @@ const MyCart = () => {
         return;
       }
 
+      // const data = await res.json();
+      // setCartItems(Array.isArray(data.cart) ? data.cart : []);
       const data = await res.json();
-      setCartItems(Array.isArray(data.cart) ? data.cart : []);
+      const cart = Array.isArray(data.cart) ? data.cart : [];
+
+      // 🔥 AUTO REMOVE OUT-OF-STOCK ITEMS
+      const validItems = [];
+
+      for (const item of cart) {
+        const outOfStock =
+          item.product.quantity === 0 ||
+          item.product.status === "sold";
+
+        if (outOfStock) {
+          await removeOutOfStockItem(item.product._id);
+        } else {
+          validItems.push(item);
+        }
+      }
+
+      setCartItems(validItems);
+
     } catch {
       setError("Failed to load cart. Please refresh.");
     } finally {
@@ -88,6 +108,19 @@ const MyCart = () => {
     0
   );
 
+  /* -------- REMOVE OUT OF STOCK ITEM FROM DB -------- */
+  const removeOutOfStockItem = async (productId) => {
+    try {
+      await fetch(`${API_URL}/api/cart/remove/${productId}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+    } catch {
+      // silent fail
+    }
+  };
+
+
   /* ---------------- LOADING ---------------- */
   if (loading) {
     return (
@@ -96,6 +129,8 @@ const MyCart = () => {
       </div>
     );
   }
+
+
 
   return (
     <div className="min-h-screen bg-slate-900 relative overflow-hidden">
@@ -161,7 +196,9 @@ const MyCart = () => {
                       />
 
                       {/* DETAILS */}
-                      <div className="flex-1">
+                      <div className="flex-1 hover:cursor-pointer " onClick={() =>
+                        navigate(`/product/${item.product._id}`)
+                      } >
                         <h2 className="text-lg font-semibold text-slate-100">
                           {item.product.name}
                         </h2>
@@ -217,16 +254,15 @@ const MyCart = () => {
                             outOfStock ||
                             maxReached ||
                             actionLoading ===
-                              item.product._id
+                            item.product._id
                           }
                           onClick={() =>
                             addToCart(item.product._id)
                           }
-                          className={`text-sm transition ${
-                            outOfStock || maxReached
-                              ? "text-slate-500 cursor-not-allowed"
-                              : "text-cyan-300 hover:text-cyan-200"
-                          }`}
+                          className={`text-sm transition ${outOfStock || maxReached
+                            ? "text-slate-500 cursor-not-allowed"
+                            : "text-cyan-300 hover:text-cyan-200"
+                            }`}
                         >
                           {actionLoading === item.product._id
                             ? "Adding…"

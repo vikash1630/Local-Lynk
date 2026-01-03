@@ -14,5 +14,7 @@ exports.getProductById = async (productId) => {
     throw error;
   }
 
+  console.log(product)
+
   return product;
 };

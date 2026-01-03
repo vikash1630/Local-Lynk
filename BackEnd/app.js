@@ -132,6 +132,12 @@ const MarkSold = require("./src/routes/MarkProductAsSoldRoute")
 // Edit Profile 
 const EditProfile = require("./src/routes/EditProfileRoute")
 
+// Buy Now
+const BuyNow = require("./src/routes/buyNowRoute")
+
+// My Orders
+const MyOrders = require("./src/routes/myOrdersRoute")
+
 console.log()
 
 // Use Routes
@@ -165,6 +171,8 @@ app.use("/api/cart", cartItemsRoute);
 app.use("/api/Myproducts", MyProducts)
 app.use("/api/products", MarkSold);
 app.use("/api/EditProfile", EditProfile);
+app.use("/api/orders" , BuyNow)
+app.use("/api/orders" , MyOrders)
 
 // console.log(process.env.CLOUDINARY_CLOUD_NAME)
 

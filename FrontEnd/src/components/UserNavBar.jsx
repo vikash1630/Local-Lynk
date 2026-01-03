@@ -87,6 +87,7 @@ const UserNavBar = () => {
     ["Community", "/community"],
     ["My Cart", "/my-cart"],
     ["My Products", "/myproducts"],
+    ["My Orders", "/MyOrders"]
   ];
 
   return (

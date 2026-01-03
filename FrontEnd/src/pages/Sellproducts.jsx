@@ -67,7 +67,7 @@ const Sellproducts = () => {
       formData.append("lng", lng);
 
       if (image) {
-        formData.append("image", image); // ✅ SINGLE IMAGE
+        formData.append("images", image); // ✅ correct
       }
 
       const res = await fetch(`${API_URL}/api/product/add-product`, {

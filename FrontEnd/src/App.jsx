@@ -16,6 +16,7 @@ import CheckOut from './pages/CheckOut.jsx';
 import Sellproducts from './pages/Sellproducts.jsx';
 import MyProducts from './pages/MyProducts.jsx';
 import EditProfile from './pages/EditProfile.jsx';
+import MyOrder from './pages/MyOrder.jsx';
 
 
 const App = () => {
@@ -100,6 +101,10 @@ const App = () => {
       element: <EditProfile />
       // to edit profile
     },
+    {
+      path: "/MyOrders",
+      element: <MyOrder />
+    }
   ]);
 
 
