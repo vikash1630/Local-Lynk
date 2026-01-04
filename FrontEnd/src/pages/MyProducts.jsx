@@ -70,71 +70,101 @@ const MyProducts = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center text-slate-400 bg-gradient-to-br from-slate-950 via-zinc-950 to-black">
+      <div className="min-h-screen flex items-center justify-center
+        text-zinc-300
+        bg-gradient-to-br from-black via-indigo-950 to-black">
         Loading your products…
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen relative bg-gradient-to-br from-slate-950 via-zinc-950 to-black overflow-hidden">
-      {/* 🎴 INFINITY CASTLE AURA */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(99,102,241,0.08),transparent_65%)]" />
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom,rgba(139,92,246,0.06),transparent_70%)]" />
+    <div className="min-h-screen relative overflow-hidden
+      bg-gradient-to-br from-black via-indigo-950 to-black">
 
-      <div className="relative z-10">
-        <UserNavBar />
+      {/* EPIC NIGHT ENJOYMENT AURA (non-sexual, cinematic) */}
+      <div className="pointer-events-none absolute inset-0
+        bg-[radial-gradient(circle_at_top,rgba(99,102,241,0.22),transparent_55%)]" />
+      <div className="pointer-events-none absolute inset-0
+        bg-[radial-gradient(circle_at_bottom,rgba(236,72,153,0.18),transparent_65%)]" />
+
+      <UserNavBar />
+
+      {/* PAGE CONTENT aligned with navbar */}
+      <div className="relative z-10 max-w-[1400px] mx-3 md:mx-6 mt-6">
 
         {/* HEADER */}
-        <div className="sticky top-0 z-10 backdrop-blur bg-black/70 border-b border-slate-800">
-          <div className="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
-            <h1 className="text-2xl font-semibold tracking-wide text-slate-200">
-              My Products
-            </h1>
+        <div className="flex justify-between items-center
+          px-5 py-4 rounded-2xl
+          bg-black/70 backdrop-blur-xl
+          border border-red-900/40
+          shadow-[0_0_45px_rgba(99,102,241,0.25)]">
+          <h1 className="text-2xl font-semibold tracking-wide text-zinc-100">
+            My Products
+          </h1>
 
-            <Link
-              to="/sell-products"
-              className="inline-flex items-center gap-2 rounded-lg
-              bg-slate-900 border border-slate-700
-              px-4 py-2 text-sm font-medium text-slate-200
-              hover:bg-slate-800 transition"
-            >
-              + Sell Product
-            </Link>
-          </div>
+          <Link
+            to="/sell-products"
+            className="inline-flex items-center gap-2
+              rounded-full
+              bg-gradient-to-r from-red-700 to-pink-600
+              px-5 py-2
+              text-sm font-medium text-white
+              shadow-lg
+              hover:from-red-600 hover:to-pink-500
+              transition"
+          >
+            + Sell Product
+          </Link>
         </div>
 
         {/* CONTENT */}
-        <div className="max-w-6xl mx-auto px-6 py-10">
+        <div className="mt-10">
           {error && (
-            <div className="mb-6 rounded-lg border border-rose-900/60 bg-rose-950/40 px-4 py-3 text-rose-300">
+            <div className="mb-6 rounded-xl
+              border border-rose-900/60
+              bg-rose-950/40
+              px-4 py-3
+              text-rose-300">
               {error}
             </div>
           )}
 
           {products.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-24 text-center">
-              <div className="mb-4 text-5xl opacity-70">📦</div>
-              <p className="text-slate-400 mb-6">
+            <div className="flex flex-col items-center justify-center
+              py-24 text-center">
+              <div className="mb-4 text-5xl opacity-80">📦</div>
+              <p className="text-zinc-400 mb-6">
                 You haven’t added any products yet.
               </p>
               <Link
                 to="/sell-products"
-                className="rounded-lg bg-slate-900 border border-slate-700 px-6 py-3 text-slate-200 font-medium hover:bg-slate-800 transition"
+                className="rounded-full
+                  bg-black/70
+                  border border-zinc-700
+                  px-6 py-3
+                  text-zinc-200 font-medium
+                  hover:border-pink-500 hover:text-pink-400
+                  transition"
               >
                 Add Your First Product
               </Link>
             </div>
           ) : (
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
               {products.map((product) => (
                 <div
                   key={product._id}
                   onClick={() => navigate(`/product/${product._id}`)}
-                  className="group relative cursor-pointer rounded-2xl
-                  bg-black/80 border border-slate-800
-                  backdrop-blur-xl shadow-[0_0_30px_rgba(0,0,0,0.8)]
-                  transition-all duration-300 hover:scale-[1.02]"
+                  className="group relative cursor-pointer
+                    rounded-2xl
+                    bg-black/75
+                    border border-zinc-800
+                    backdrop-blur-xl
+                    shadow-[0_0_35px_rgba(0,0,0,0.9)]
+                    transition-all duration-300
+                    hover:border-pink-500/60
+                    hover:shadow-[0_0_70px_rgba(236,72,153,0.45)]"
                 >
                   {/* STATUS BADGE */}
                   <div className="absolute top-4 right-4 z-10">
@@ -144,10 +174,12 @@ const MyProducts = () => {
                         product.status === "available" &&
                           markAsSold(product._id);
                       }}
-                      className={`rounded-full px-3 py-1 text-xs font-medium tracking-wide
-                      ${product.status === "available"
-                          ? "bg-slate-800 text-slate-200 hover:bg-slate-700"
-                          : "bg-slate-900 text-slate-500 cursor-not-allowed"
+                      className={`rounded-full px-3 py-1
+                        text-xs font-medium tracking-wide
+                        ${
+                          product.status === "available"
+                            ? "bg-gradient-to-r from-emerald-600 to-green-500 text-white shadow-md"
+                            : "bg-zinc-900 text-zinc-500 cursor-not-allowed"
                         }`}
                     >
                       {product.status === "available" ? "AVAILABLE" : "SOLD"}
@@ -160,51 +192,53 @@ const MyProducts = () => {
                       src={product.images?.[0] || "/placeholder.png"}
                       alt={product.name}
                       className="h-48 w-full object-cover
-                      transition-transform duration-700
-                      group-hover:scale-105"
+                        transition-transform duration-700
+                        group-hover:scale-110"
                     />
                   </div>
 
                   {/* BODY */}
                   <div className="p-5">
-                    <h2 className="text-lg font-medium text-slate-200 tracking-wide">
+                    <h2 className="text-lg font-medium text-zinc-100 tracking-wide">
                       {product.name}
                     </h2>
 
-                    <p className="mt-1 text-sm text-slate-400 line-clamp-2">
+                    <p className="mt-1 text-sm text-zinc-400 line-clamp-2">
                       {product.description || "No description"}
                     </p>
 
                     <div className="mt-4 flex justify-between items-end">
                       <div>
-                        <p className="text-xs uppercase tracking-widest text-slate-500">
+                        <p className="text-xs uppercase tracking-widest text-zinc-500">
                           Quantity
                         </p>
-                        <p className="text-lg font-medium text-slate-300">
+                        <p className="text-lg font-medium text-zinc-300">
                           {product.quantity}
                         </p>
                       </div>
 
-                      <p className="text-2xl font-semibold text-indigo-400">
+                      <p className="text-2xl font-semibold text-pink-400">
                         ₹{product.price}
                       </p>
                     </div>
 
                     {product.status === "available" && (
-                      <p className="mt-3 text-xs text-slate-500 italic">
-                        Tap on <span className="relative font-semibold text-emerald-400">
+                      <p className="mt-3 text-xs text-zinc-500 italic">
+                        Tap on{" "}
+                        <span className="relative font-semibold text-emerald-400">
                           "AVAILABLE"
-                          <span className="absolute left-0 -bottom-0.5 h-[2px] w-full bg-emerald-400 opacity-70 animate-pulse"></span>
-                        </span>
-                        <span>    </span>
+                          <span className="absolute left-0 -bottom-0.5
+                            h-[2px] w-full bg-emerald-400 opacity-70 animate-pulse" />
+                        </span>{" "}
                         to mark as sold
                       </p>
                     )}
                   </div>
 
-                  {/* NAKIME DEPTH OVERLAY */}
-                  <div className="pointer-events-none absolute inset-0 rounded-2xl
-                  bg-[radial-gradient(circle_at_center,rgba(99,102,241,0.08),transparent_65%)]" />
+                  {/* FESTIVE NIGHT GLOW */}
+                  <div className="pointer-events-none absolute inset-0
+                    rounded-2xl
+                    bg-[radial-gradient(circle_at_center,rgba(236,72,153,0.18),transparent_65%)]" />
                 </div>
               ))}
             </div>
