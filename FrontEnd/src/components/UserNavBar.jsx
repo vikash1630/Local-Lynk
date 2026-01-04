@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
+import logo from "../assets/LLLogo.jpeg";
+
 
 const UserNavBar = () => {
   const [query, setQuery] = useState("");
@@ -28,10 +30,7 @@ const UserNavBar = () => {
       try {
         const res = await fetch(
           `${API_URL}/api/product/search?q=${encodeURIComponent(query)}`,
-          {
-            method: "GET",
-            credentials: "include",
-          }
+          { credentials: "include" }
         );
         const data = await res.json();
         setSuggestions(Array.isArray(data) ? data : []);
@@ -108,51 +107,62 @@ const UserNavBar = () => {
   ];
 
   return (
-    <nav className="sticky top-0 z-50 bg-slate-900 border-b border-rose-900/40">
-      <div className="max-w-[1400px] mx-auto px-3 py-2 flex items-center gap-3">
+    <nav className="sticky top-0 z-50 bg-[#0a0a0a] border-b border-red-900/40">
+      <div className="max-w-[1400px] mx-auto px-3 py-2 md:px-4 md:py-3 flex flex-wrap md:flex-nowrap items-center gap-3 md:gap-4">
 
         {/* MOBILE MENU BUTTON */}
         <button
           onClick={() => setMobileOpen(!mobileOpen)}
-          className="md:hidden flex flex-col gap-[5px] p-2 rounded-md hover:bg-slate-800 transition"
+          className="md:hidden flex flex-col gap-[5px] p-2 rounded-md hover:bg-red-950/40 transition"
         >
-          <span className="w-6 h-[2px] bg-slate-300" />
-          <span className="w-6 h-[2px] bg-slate-300" />
-          <span className="w-6 h-[2px] bg-slate-300" />
+          <span className="w-6 h-[2px] bg-zinc-300" />
+          <span className="w-6 h-[2px] bg-zinc-300" />
+          <span className="w-6 h-[2px] bg-zinc-300" />
         </button>
 
         {/* APP LOGO */}
-        <Link to="/home" className="flex items-center gap-2">
-          <div className="w-9 h-9 rounded-full bg-gradient-to-br from-rose-500 to-fuchsia-500 flex items-center justify-center text-sm font-bold text-white">
-            LL
-          </div>
-          <span className="text-base font-semibold text-rose-400">
+        <Link to="/home" className="flex items-center gap-2 md:gap-3 shrink-0">
+          <img
+            src={logo}
+            alt="LocalLynk Logo"
+            className="
+    h-8 w-8 md:h-10 md:w-10
+    object-cover
+    rounded-md
+    border border-red-900/40
+    bg-black
+  "
+          />
+
+          <span className="text-base md:text-lg font-semibold text-red-500 leading-none">
             LocalLynk
           </span>
         </Link>
 
+
         {/* DESKTOP NAV LINKS */}
         <div
           ref={navRef}
-          className="hidden md:flex items-center gap-6 relative ml-8"
+          className="hidden md:flex items-center gap-8 relative ml-10"
         >
           {navLinks.map(([label, path]) => (
             <Link
               key={path}
               to={path}
               data-path={path}
-              className={`text-sm font-medium transition-colors ${
-                location.pathname === path
-                  ? "text-rose-400"
-                  : "text-slate-300 hover:text-rose-400"
-              }`}
+              className={`text-base font-medium transition-colors ${location.pathname === path
+                ? "text-red-500"
+                : "text-zinc-400 hover:text-red-500"
+                }`}
             >
               {label}
             </Link>
           ))}
 
           <span
-            className="absolute -bottom-1 h-[2px] bg-rose-500 rounded-full transition-all duration-300 ease-in-out"
+            className="absolute -bottom-1.5 h-[3px]
+              bg-gradient-to-r from-red-700 to-red-500
+              rounded-full transition-all duration-300 ease-in-out"
             style={{
               width: indicatorStyle.width,
               left: indicatorStyle.left,
@@ -160,32 +170,40 @@ const UserNavBar = () => {
           />
         </div>
 
-        {/* SEARCH BAR */}
-        <div className="relative ml-auto w-full md:w-[320px] max-w-[260px]">
-          <div className="flex rounded-md overflow-hidden border border-slate-600 focus-within:border-rose-500 transition">
+        {/* SEARCH BAR (FIXED) */}
+        <div className="relative w-full mt-2 md:mt-0 md:ml-auto md:max-w-[300px]">
+          <div className="flex rounded-md md:rounded-lg overflow-hidden
+            border border-zinc-700 focus-within:border-red-700 transition">
             <input
               type="text"
               placeholder="Search products..."
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               onKeyDown={handleKeyDown}
-              className="flex-1 px-2 py-2 text-sm bg-slate-800 text-slate-200 placeholder-slate-400 outline-none"
+              className="flex-1 px-3 py-2 md:px-3 md:py-3
+                text-sm md:text-base
+                bg-[#0f0f0f] text-zinc-200
+                placeholder-zinc-500 outline-none"
             />
             <button
               onClick={handleSearch}
-              className="px-3 bg-rose-600 text-white text-sm hover:bg-rose-700 transition"
+              className="px-4 bg-red-700 text-zinc-100
+                text-sm md:text-base hover:bg-red-800 transition"
             >
               Search
             </button>
           </div>
 
           {suggestions.length > 0 && (
-            <ul className="absolute mt-1 w-full bg-slate-800 border border-slate-700 rounded shadow z-50">
+            <ul className="absolute mt-1 w-full bg-[#0f0f0f]
+              border border-zinc-700 rounded shadow z-50">
               {suggestions.map((item) => (
                 <li
                   key={item._id}
                   onClick={() => handleSuggestionClick(item._id)}
-                  className="px-3 py-2 text-sm cursor-pointer text-slate-200 hover:bg-rose-900/30 hover:text-rose-400 transition"
+                  className="px-4 py-2 md:py-3
+                    text-sm md:text-base cursor-pointer
+                    text-zinc-200 hover:bg-red-950/40 hover:text-red-400 transition"
                 >
                   {item.name}
                 </li>
@@ -197,7 +215,7 @@ const UserNavBar = () => {
         {/* LOGOUT (DESKTOP) */}
         <Link
           to="/logout"
-          className="hidden md:block ml-6 text-sm font-medium text-rose-400 hover:text-rose-500 transition"
+          className="hidden md:block ml-8 text-base font-medium text-red-500 hover:text-red-600 transition"
         >
           Logout
         </Link>
@@ -205,17 +223,16 @@ const UserNavBar = () => {
 
       {/* MOBILE MENU */}
       {mobileOpen && (
-        <div className="md:hidden bg-slate-900 border-t border-slate-800 px-4 py-4 space-y-4 transition-all duration-200">
+        <div className="md:hidden bg-[#0a0a0a] border-t border-zinc-800 px-4 py-4 space-y-4">
           {navLinks.map(([label, path]) => (
             <Link
               key={path}
               to={path}
               onClick={() => setMobileOpen(false)}
-              className={`block text-sm font-medium py-2 ${
-                location.pathname === path
-                  ? "text-rose-400 underline"
-                  : "text-slate-300 hover:text-rose-400"
-              }`}
+              className={`block text-sm font-medium py-2 ${location.pathname === path
+                ? "text-red-500"
+                : "text-zinc-400 hover:text-red-500"
+                }`}
             >
               {label}
             </Link>
@@ -224,7 +241,7 @@ const UserNavBar = () => {
           <Link
             to="/logout"
             onClick={() => setMobileOpen(false)}
-            className="block text-sm font-medium text-rose-500 pt-3"
+            className="block text-sm font-medium text-red-600 pt-3"
           >
             Logout
           </Link>

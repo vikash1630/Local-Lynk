@@ -81,16 +81,20 @@ const NearbyProductsPage = () => {
   };
 
   return (
-    <div className="relative bg-slate-900 overflow-hidden">
-      {/* 🌈 GRADIENTS */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(251,191,36,0.35),transparent_55%)]" />
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom_right,rgba(244,63,94,0.35),transparent_55%)]" />
-      <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-slate-800 to-amber-900/30" />
+    <div className="relative min-h-screen bg-gradient-to-br from-[#0b1020] via-[#0f172a] to-[#1e1b4b] overflow-hidden">
+      {/* 🌙 Moonlight glows */}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(167,139,250,0.18),transparent_55%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom_right,rgba(236,72,153,0.12),transparent_55%)]" />
 
       <div className="relative z-10 max-w-7xl mx-auto px-6 py-10">
-        {/* SEARCH */}
-        <div className="rounded-3xl bg-slate-800/70 backdrop-blur-xl border border-slate-700 p-6 shadow-xl mb-10">
-          <h2 className="text-2xl font-bold bg-gradient-to-r from-amber-400 to-rose-400 text-transparent bg-clip-text mb-4">
+
+        {/* SEARCH CARD */}
+        <div className="rounded-3xl bg-[#020617]/70 backdrop-blur-xl
+          border border-indigo-900/30 p-6 shadow-[0_0_60px_rgba(167,139,250,0.15)] mb-10">
+
+          <h2 className="text-2xl font-bold
+            bg-gradient-to-r from-indigo-300 to-pink-300
+            text-transparent bg-clip-text mb-4">
             Find Nearby Products
           </h2>
 
@@ -98,7 +102,8 @@ const NearbyProductsPage = () => {
             <select
               value={distance}
               onChange={(e) => setDistance(e.target.value)}
-              className="bg-slate-900/60 border border-slate-700 text-slate-200 rounded px-3 py-2"
+              className="bg-[#020617]/80 border border-indigo-900/40
+                text-indigo-100 rounded px-3 py-2"
             >
               <option value="">Select distance</option>
               <option value="1000">1 km</option>
@@ -111,35 +116,43 @@ const NearbyProductsPage = () => {
             <button
               onClick={handleSearch}
               disabled={loading}
-              className="px-6 py-2 rounded bg-gradient-to-r from-amber-500 to-rose-500 text-white font-semibold hover:scale-105 transition"
+              className="px-6 py-2 rounded
+                bg-gradient-to-r from-indigo-500 to-violet-500
+                text-white font-semibold transition
+                hover:opacity-90"
             >
               {loading ? "Searching..." : "Find Nearby"}
             </button>
           </div>
         </div>
 
-        {/* PRODUCTS */}
+        {/* PRODUCTS GRID */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {nearbyProducts.map((product) => (
             <div
               key={product._id}
               onClick={() => navigate(`/product/${product._id}`)}
-              className="group rounded-2xl bg-slate-800/70 backdrop-blur-xl border border-slate-700 p-4 cursor-pointer shadow-lg transition hover:scale-105 hover:shadow-[0_30px_80px_rgba(251,191,36,0.25)]"
+              className="group rounded-2xl bg-[#020617]/70 backdrop-blur-xl
+                border border-indigo-900/30 p-4 cursor-pointer
+                shadow-lg transition
+                hover:scale-[1.03]
+                hover:shadow-[0_30px_80px_rgba(167,139,250,0.22)]"
             >
               <img
                 src={product.images?.[0] || "/placeholder.png"}
+                alt={product.name}
                 className="h-40 w-full object-cover rounded-xl"
               />
 
-              <h3 className="mt-3 text-lg font-semibold text-slate-200">
+              <h3 className="mt-3 text-lg font-semibold text-indigo-100">
                 {product.name}
               </h3>
 
-              <p className="text-sm text-slate-400 line-clamp-2">
+              <p className="text-sm text-indigo-200/60 line-clamp-2">
                 {product.description}
               </p>
 
-              <p className="text-xl font-bold text-amber-400 mt-2">
+              <p className="text-xl font-bold text-pink-300 mt-2">
                 ₹{product.price}
               </p>
 
@@ -147,20 +160,20 @@ const NearbyProductsPage = () => {
                 <button
                   onClick={(e) => addToCart(e, product._id)}
                   disabled={addedToCart[product._id]}
-                  className={`flex-1 py-2 rounded text-sm font-medium ${
+                  className={`flex-1 py-2 rounded text-sm font-medium transition ${
                     addedToCart[product._id]
-                      ? "bg-slate-600 cursor-not-allowed"
-                      : "bg-amber-500 hover:bg-amber-600"
+                      ? "bg-indigo-900/50 cursor-not-allowed text-indigo-200"
+                      : "bg-indigo-500 hover:bg-indigo-600 text-white"
                   }`}
                 >
-                  {addedToCart[product._id]
-                    ? "Added"
-                    : "Add to Cart"}
+                  {addedToCart[product._id] ? "Added" : "Add to Cart"}
                 </button>
 
                 <button
                   onClick={(e) => buyNow(e, product._id)}
-                  className="flex-1 py-2 rounded bg-rose-500 text-white hover:bg-rose-600"
+                  className="flex-1 py-2 rounded
+                    bg-pink-500 text-white
+                    hover:bg-pink-600 transition"
                 >
                   Buy Now
                 </button>
@@ -168,6 +181,7 @@ const NearbyProductsPage = () => {
             </div>
           ))}
         </div>
+
       </div>
     </div>
   );

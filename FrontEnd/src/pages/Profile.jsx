@@ -26,13 +26,11 @@ const Profile = () => {
 
         const data = await res.json();
         if (!res.ok) throw new Error(data.message);
-
         setUser(data);
       } catch (err) {
         setError(err.message || "Failed to load profile");
       }
     };
-
     fetchProfile();
   }, [API_URL]);
 
@@ -43,14 +41,12 @@ const Profile = () => {
         const res = await fetch(`${API_URL}/api/friends`, {
           credentials: "include",
         });
-
         const data = await res.json();
         if (res.ok) setFriends(data.friends || []);
       } finally {
         setLoading(false);
       }
     };
-
     fetchFriends();
   }, [API_URL]);
 
@@ -65,30 +61,25 @@ const Profile = () => {
         if (res.ok) setBlockedUsers(data.blockedUsers || []);
       } catch {}
     };
-
     fetchBlocked();
   }, [API_URL]);
 
   /* ================= ACTIONS ================= */
   const handleUnfriend = async (friendId) => {
     if (!confirm("Unfriend this user?")) return;
-
     await fetch(`${API_URL}/api/user/unfriend/${friendId}`, {
       method: "DELETE",
       credentials: "include",
     });
-
     setFriends((prev) => prev.filter((f) => f._id !== friendId));
   };
 
   const handleBlock = async (friendId) => {
     if (!confirm("Block this user?")) return;
-
     await fetch(`${API_URL}/api/user/block/${friendId}`, {
       method: "POST",
       credentials: "include",
     });
-
     setFriends((prev) => prev.filter((f) => f._id !== friendId));
     setBlockedUsers((prev) => [...prev, { _id: friendId }]);
   };
@@ -98,14 +89,13 @@ const Profile = () => {
       method: "POST",
       credentials: "include",
     });
-
     setBlockedUsers((prev) => prev.filter((u) => u._id !== userId));
   };
 
   /* ================= LOADING / ERROR ================= */
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-900 text-slate-400">
+      <div className="min-h-screen flex items-center justify-center bg-[#0b1020] text-indigo-200/70">
         Loading profile…
       </div>
     );
@@ -113,18 +103,17 @@ const Profile = () => {
 
   if (error || !user) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-900 text-rose-400">
+      <div className="min-h-screen flex items-center justify-center bg-[#0b1020] text-rose-300">
         {error || "Profile not found"}
       </div>
     );
   }
 
-  /* ================= UI ================= */
   return (
-    <div className="min-h-screen bg-slate-900 relative overflow-hidden">
-      {/* Background glow */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(244,63,94,0.25),transparent_55%)]" />
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom_right,rgba(99,102,241,0.25),transparent_55%)]" />
+    <div className="min-h-screen bg-gradient-to-br from-[#0b1020] via-[#0f172a] to-[#1e1b4b] relative overflow-hidden">
+      {/* 🌙 Moonlight glows */}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(236,72,153,0.18),transparent_55%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom_right,rgba(129,140,248,0.20),transparent_55%)]" />
 
       <div className="relative z-10">
         <UserNavBar />
@@ -132,21 +121,23 @@ const Profile = () => {
         <div className="max-w-5xl mx-auto px-4 py-10 space-y-10">
 
           {/* ===== PROFILE CARD ===== */}
-          <div className="rounded-3xl bg-slate-900/80 backdrop-blur-xl border border-slate-700 p-8 shadow-xl">
+          <div className="rounded-3xl bg-[#020617]/70 backdrop-blur-xl border border-pink-900/30 p-8 shadow-[0_0_60px_rgba(236,72,153,0.15)]">
             <div className="flex flex-col sm:flex-row gap-6 items-center sm:items-start">
-              {/* PROFILE PHOTO */}
               <img
-                src={user?.profilePhoto || DEFAULT_PROFILE_PHOTO}
+                src={user.profilePhoto || DEFAULT_PROFILE_PHOTO}
                 alt="Profile"
-                className="w-32 h-32 rounded-full object-cover border-2 border-rose-500/60 shadow-xl"
+                className="w-32 h-32 rounded-full object-cover
+                border-2 border-pink-400/60 shadow-[0_0_30px_rgba(236,72,153,0.4)]"
               />
 
               <div className="flex-1 text-center sm:text-left">
-                <h1 className="text-3xl sm:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-rose-400 to-indigo-400">
+                <h1 className="text-3xl sm:text-4xl font-extrabold
+                  bg-gradient-to-r from-pink-300 to-indigo-300
+                  text-transparent bg-clip-text">
                   {user.name}
                 </h1>
 
-                <p className="text-slate-400 mt-1 break-all">
+                <p className="text-indigo-200/70 mt-1 break-all">
                   {user.email}
                 </p>
 
@@ -159,11 +150,13 @@ const Profile = () => {
                   />
                 </div>
 
-                {/* CENTERED EDIT BUTTON */}
                 <div className="mt-8 flex justify-center sm:justify-start">
                   <Link
                     to="/EditProfile"
-                    className="px-8 py-3 rounded-xl bg-gradient-to-r from-rose-500 to-pink-500 text-white font-bold shadow-xl hover:scale-105 transition"
+                    className="px-8 py-3 rounded-xl
+                    bg-gradient-to-r from-pink-500 to-rose-500
+                    text-white font-bold shadow-xl
+                    hover:scale-105 transition"
                   >
                     Edit Profile
                   </Link>
@@ -197,7 +190,7 @@ const Profile = () => {
             ) : (
               blockedUsers.map((u) => (
                 <Row key={u._id}>
-                  <span className="text-slate-300 truncate">{u.name || u._id}</span>
+                  <span className="text-indigo-200 truncate">{u.name || u._id}</span>
                   <Btn onClick={() => handleUnblock(u._id)} text="Unblock" color="emerald" />
                 </Row>
               ))
@@ -213,29 +206,30 @@ const Profile = () => {
 /* ================= SMALL COMPONENTS ================= */
 
 const Stat = ({ label, value }) => (
-  <div className="rounded-xl bg-slate-950/70 border border-slate-700 p-4">
-    <p className="text-xs text-slate-400 uppercase">{label}</p>
-    <p className="text-slate-200 font-semibold truncate">{value}</p>
+  <div className="rounded-xl bg-[#020617]/70 border border-indigo-900/30 p-4">
+    <p className="text-xs text-indigo-200/60 uppercase">{label}</p>
+    <p className="text-indigo-100 font-semibold truncate">{value}</p>
   </div>
 );
 
 const Section = ({ title, children }) => (
-  <div className="rounded-3xl bg-slate-800/70 backdrop-blur-xl border border-slate-700 p-8 shadow-xl">
-    <h2 className="text-xl font-bold text-rose-300 mb-6">{title}</h2>
+  <div className="rounded-3xl bg-[#020617]/70 backdrop-blur-xl border border-indigo-900/30 p-8 shadow-xl">
+    <h2 className="text-xl font-bold text-pink-300 mb-6">{title}</h2>
     <div className="space-y-4">{children}</div>
   </div>
 );
 
 const Row = ({ children }) => (
-  <div className="flex flex-col sm:flex-row justify-between items-center gap-4 rounded-xl bg-slate-900/60 border border-slate-700 p-4">
+  <div className="flex flex-col sm:flex-row justify-between items-center gap-4
+    rounded-xl bg-[#020617]/60 border border-indigo-900/30 p-4">
     {children}
   </div>
 );
 
 const UserMini = ({ user }) => (
   <div className="text-center sm:text-left">
-    <p className="text-slate-200 font-semibold">{user.name}</p>
-    <p className="text-sm text-slate-400 break-all">{user.email}</p>
+    <p className="text-indigo-100 font-semibold">{user.name}</p>
+    <p className="text-sm text-indigo-200/60 break-all">{user.email}</p>
   </div>
 );
 
@@ -243,7 +237,7 @@ const Btn = ({ text, onClick, color }) => {
   const colors = {
     indigo: "bg-indigo-500 hover:bg-indigo-600",
     amber: "bg-amber-500 hover:bg-amber-600",
-    rose: "bg-rose-600 hover:bg-rose-700",
+    rose: "bg-rose-500 hover:bg-rose-600",
     emerald: "bg-emerald-500 hover:bg-emerald-600",
   };
 
@@ -258,7 +252,7 @@ const Btn = ({ text, onClick, color }) => {
 };
 
 const Empty = ({ text }) => (
-  <p className="text-slate-400 text-center">{text}</p>
+  <p className="text-indigo-200/60 text-center">{text}</p>
 );
 
 export default Profile;

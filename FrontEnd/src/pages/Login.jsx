@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { GoogleLogin } from "@react-oauth/google";
+import IndexNavBar from "../components/IndexNavBar";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -17,18 +18,13 @@ const Login = () => {
     try {
       const res = await fetch(`${API_URL}/api/google`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         credentials: "include",
         body: JSON.stringify({ token: googleToken }),
       });
 
       const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.message || "Google login failed");
-      }
+      if (!res.ok) throw new Error(data.message || "Google login failed");
 
       navigate("/home");
     } catch (err) {
@@ -46,17 +42,12 @@ const Login = () => {
       const res = await fetch(`${API_URL}/api/login`, {
         method: "POST",
         credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
       });
 
       const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.message || "Login failed");
-      }
+      if (!res.ok) throw new Error(data.message || "Login failed");
 
       navigate("/home");
     } catch (err) {
@@ -67,77 +58,111 @@ const Login = () => {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-100 px-4">
-      <div className="w-full max-w-md rounded-xl bg-white p-8 shadow-lg">
-        <h2 className="mb-6 text-center text-2xl font-bold text-gray-800">
-          Login
-        </h2>
+    <div className="min-h-screen bg-gradient-to-br from-[#0f172a] via-[#020617] to-[#1a1a1a]">
+      <IndexNavBar />
 
-        {error && (
-          <p className="mb-4 rounded-md bg-red-100 px-3 py-2 text-sm text-red-700">
-            {error}
+      <div className="flex min-h-[calc(100vh-64px)] items-center justify-center px-4 py-10">
+        <div
+          className="relative w-full max-w-md sm:max-w-lg
+          rounded-2xl border border-rose-900/40
+          bg-[#020617]/80 backdrop-blur-xl
+          p-6 sm:p-8
+          shadow-[0_0_80px_rgba(244,63,94,0.15)]"
+        >
+          {/* 🔥 HEADING */}
+          <h2
+            className="mb-2 text-center text-3xl sm:text-4xl font-extrabold
+            bg-gradient-to-r from-red-500 via-rose-400 to-pink-400
+            text-transparent bg-clip-text"
+          >
+            Welcome Back
+          </h2>
+
+          <p className="mb-6 text-center text-slate-400 text-base sm:text-lg">
+            Return to <span className="text-rose-400 font-semibold">LocalLynk</span>
           </p>
-        )}
 
-        <form onSubmit={handleSubmit} className="space-y-5">
-          <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700">
-              Email
-            </label>
-            <input
-              type="email"
-              placeholder="Enter email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+          {error && (
+            <p
+              className="mb-4 rounded-lg border border-red-500/30
+              bg-red-500/10 px-4 py-3 text-red-300"
+            >
+              {error}
+            </p>
+          )}
+
+          {/* FORM */}
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div>
+              <label className="mb-1 block text-base font-medium text-slate-300">
+                Email
+              </label>
+              <input
+                type="email"
+                placeholder="you@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                className="w-full rounded-lg bg-[#020617]/70
+                  border border-slate-700 px-4 py-3
+                  text-base text-slate-200 placeholder-slate-500
+                  outline-none transition
+                  focus:border-rose-400
+                  focus:ring-2 focus:ring-rose-400/30"
+              />
+            </div>
+
+            <div>
+              <label className="mb-1 block text-base font-medium text-slate-300">
+                Password
+              </label>
+              <input
+                type="password"
+                placeholder="Enter your password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                className="w-full rounded-lg bg-[#020617]/70
+                  border border-slate-700 px-4 py-3
+                  text-base text-slate-200 placeholder-slate-500
+                  outline-none transition
+                  focus:border-rose-400
+                  focus:ring-2 focus:ring-rose-400/30"
+              />
+            </div>
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full rounded-lg py-3 text-lg font-semibold text-white
+                bg-gradient-to-r from-red-600 via-rose-500 to-pink-500
+                shadow-[0_0_40px_rgba(244,63,94,0.35)]
+                transition hover:opacity-90
+                disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {loading ? "Entering the Corps..." : "Login"}
+            </button>
+          </form>
+
+          {/* SIGN UP */}
+          <p className="mt-6 text-center text-slate-400">
+            New here?{" "}
+            <button
+              type="button"
+              onClick={() => navigate("/signup")}
+              className="font-semibold text-rose-400 hover:underline"
+            >
+              Become a Member
+            </button>
+          </p>
+
+          {/* GOOGLE LOGIN */}
+          <div className="mt-6 flex justify-center scale-110">
+            <GoogleLogin
+              onSuccess={(res) => handleGoogleLogin(res.credential)}
+              onError={() => setError("Google login failed")}
             />
           </div>
-
-          <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700">
-              Password
-            </label>
-            <input
-              type="password"
-              placeholder="Enter password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-            />
-          </div>
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full rounded-md bg-blue-600 py-2 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-70"
-          >
-            {loading ? "Logging in..." : "Login"}
-          </button>
-        </form>
-
-        <p className="mt-6 text-center text-sm text-gray-600">
-          Don’t have an account?{" "}
-          <button
-            type="button"
-            onClick={() => navigate("/signup")}
-            className="font-medium text-blue-600 hover:underline"
-          >
-            Sign Up
-          </button>
-        </p>
-
-        {/* GOOGLE LOGIN */}
-        <div className="mt-4 flex justify-center">
-          <GoogleLogin
-            onSuccess={(res) =>
-              handleGoogleLogin(res.credential)
-            }
-            onError={() =>
-              setError("Google login failed")
-            }
-          />
         </div>
       </div>
     </div>

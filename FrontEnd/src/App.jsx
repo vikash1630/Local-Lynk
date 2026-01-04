@@ -1,6 +1,6 @@
 import React from 'react'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
-import Index from './pages';
+import Index from './pages/Index.jsx';
 import SignUp from './pages/SignUp.jsx';
 import Login from './pages/Login.jsx';
 import Home from './pages/Home.jsx';
@@ -17,6 +17,9 @@ import Sellproducts from './pages/Sellproducts.jsx';
 import MyProducts from './pages/MyProducts.jsx';
 import EditProfile from './pages/EditProfile.jsx';
 import MyOrder from './pages/MyOrder.jsx';
+import About from './components/About.jsx';
+import Contact from './components/Contact.jsx';
+import GuestProduct from './components/guestProduct.jsx';
 
 
 const App = () => {
@@ -104,7 +107,21 @@ const App = () => {
     {
       path: "/MyOrders",
       element: <MyOrder />
+    },
+    {
+      path: "/about",
+      element: <About />
+    },
+    {
+      path: "/Contact",
+      element: <Contact />
+    },
+    {
+      path: "/GuestProduct/:id",
+      element: <GuestProduct />
     }
+    
+
   ]);
 
 
