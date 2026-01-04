@@ -1,60 +1,82 @@
 const Chat = require("../models/Chat");
-const User = require("../models/User")
+const User = require("../models/User");
 
 const chatSocket = (io) => {
-    io.on("connection", (socket) => {
-        console.log("Socket connected:", socket.id);
+  io.on("connection", (socket) => {
+    console.log("🔌 Socket connected:", socket.id);
 
-        /**
-         * Join personal room (ONLY userId)
-         */
-        socket.on("join",async (userId) => {
-            if (!userId) return;
+    /* ---------------- JOIN PERSONAL ROOM ---------------- */
+    socket.on("join", async (userId) => {
+      if (!userId) return;
 
-            const user = await User.findOne({_id: userId});
+      const user = await User.findById(userId);
+      if (!user) return;
 
-            socket.join(userId);
-            socket.userId = userId; // bind socket to user
-            console.log(`User with id : ${userId} = ${user._id} and name : ${user.name} joined personal room`); 
-        });
+      socket.join(userId);
+      socket.userId = userId;
 
-        /**
-         * Send one-to-one message
-         */
-        socket.on("sendMessage", async (data) => {
-            const { from, to, message, messageType = "text", fileUrl } = data;
-
-            // 🔒 Strict one-to-one validation
-            if (
-                !from ||
-                !to ||
-                !message ||
-                from === to ||
-                socket.userId !== from
-            ) {
-                return;
-            }
-
-            // Save message
-            const chat = await Chat.create({
-                from,
-                to,
-                message,
-                messageType,
-                fileUrl
-            });
-
-            // Emit to receiver
-            io.to(to).emit("receiveMessage", chat);
-
-            // Emit to sender
-            io.to(from).emit("receiveMessage", chat)
-        });
-
-        socket.on("disconnect", () => {
-            console.log(`User ${socket.userId} disconnected`);
-        });
+      console.log(`👤 ${user.name} (${userId}) joined personal room`);
     });
+
+    /* ---------------- TYPING ---------------- */
+    socket.on("typing", ({ from, to }) => {
+      if (!from || !to || socket.userId !== from) return;
+      io.to(to).emit("typing");
+    });
+
+    socket.on("stopTyping", ({ from, to }) => {
+      if (!from || !to || socket.userId !== from) return;
+      io.to(to).emit("stopTyping");
+    });
+
+    /* ---------------- SEND MESSAGE ---------------- */
+    socket.on("sendMessage", async (data) => {
+      const {
+        from,
+        to,
+        message = "",
+        messageType = "text",
+        fileUrl = null
+      } = data;
+
+      // 🔒 STRICT VALIDATION
+      if (
+        !from ||
+        !to ||
+        from === to ||
+        socket.userId !== from ||
+        (messageType === "text" && !message) ||
+        (messageType !== "text" && !fileUrl)
+      ) {
+        return;
+      }
+
+      // ✅ SAVE TO DB
+      const chat = await Chat.create({
+        from,
+        to,
+        message,
+        messageType,
+        fileUrl
+      });
+
+      // ✅ SEND TO RECEIVER
+      io.to(to).emit("receiveMessage", chat);
+
+      // ✅ SEND TO SENDER
+      io.to(from).emit("receiveMessage", chat);
+
+      // ✅ DELIVERY ACK (receiver reached)
+      io.to(from).emit("messageDelivered", {
+        messageId: chat._id
+      });
+    });
+
+    /* ---------------- DISCONNECT ---------------- */
+    socket.on("disconnect", () => {
+      console.log(`❌ User ${socket.userId} disconnected`);
+    });
+  });
 };
 
 module.exports = chatSocket;

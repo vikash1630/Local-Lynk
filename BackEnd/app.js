@@ -19,10 +19,6 @@ app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 
 
-// Make uploaded files publicly accessible
-app.use("/uploads", express.static("uploads"));
-
-
 console.log("App.js Running...");
 
 // Health Check
@@ -45,13 +41,6 @@ const signUpRoute = require("./src/routes/SignUpRoute");
 
 // login route
 const LoginRoute = require("./src/routes/loginRoute");
-
-// chat route
-const chatRoute = require("./src/socket/chat");
-
-
-// Upload route
-const uploadRoute = require("./src/routes/uploadFileRoute");
 
 
 // Add Product Route
@@ -141,6 +130,12 @@ const MyOrders = require("./src/routes/myOrdersRoute")
 // Buy Whole Cart
 const CheckOut = require("./src/routes/CheckOutRoute")
 
+// Get chat History
+const ChatHistory = require("./src/routes/GetChatHistoryRoute")
+
+// File Handling using cloudinary
+const fileUpload = require("./src/routes/saveFileToCloudinaryRoute")
+
 console.log()
 
 // Use Routes
@@ -148,8 +143,6 @@ app.use("/api", signUpRoute);
 app.use("/api", LoginRoute);
 app.use("/api", googleLoginRoute);
 app.use("/api", logoutRoute);
-app.use("/api/chat", chatRoute);
-app.use("/api/chat", uploadRoute);
 app.use("/api/product", addProductRoute);
 app.use("/api/product", nearByProductsRoute);
 app.use("/api/product", searchRoute);
@@ -177,6 +170,8 @@ app.use("/api/EditProfile", EditProfile);
 app.use("/api/orders" , BuyNow)
 app.use("/api/orders" , MyOrders)
 app.use("/api/checkOut", CheckOut)
+app.use("/api/chat", ChatHistory)
+app.use("/api/chat", fileUpload)
 
 // console.log(process.env.CLOUDINARY_CLOUD_NAME)
 
@@ -186,6 +181,13 @@ app.set("chatSocket", require("./src/socket/chat"));
 
 // checking if verifyToken middleware works
 const verifyToken = require("./src/middlewares/verifyToken");
+const { getChatHistory } = require("./src/services/GetChatHistoryService");
+
+app.get("/api/user/me", verifyToken, (req, res) => {
+  res.status(200).json({
+    userId: req.user.userId || req.user.id // From Jwt 
+  })
+})
 
 app.get("/protected", verifyToken, (req, res) => {
   res.status(200).json({

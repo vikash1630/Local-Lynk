@@ -129,28 +129,28 @@ const Profile = () => {
       <div className="relative z-10">
         <UserNavBar />
 
-        <div className="max-w-5xl mx-auto px-4 py-12 space-y-10">
+        <div className="max-w-5xl mx-auto px-4 py-10 space-y-10">
 
           {/* ===== PROFILE CARD ===== */}
           <div className="rounded-3xl bg-slate-900/80 backdrop-blur-xl border border-slate-700 p-8 shadow-xl">
-
             <div className="flex flex-col sm:flex-row gap-6 items-center sm:items-start">
               {/* PROFILE PHOTO */}
               <img
                 src={user?.profilePhoto || DEFAULT_PROFILE_PHOTO}
                 alt="Profile"
-                className="w-28 h-28 rounded-full object-cover border-2 border-rose-500/50 shadow-lg"
+                className="w-32 h-32 rounded-full object-cover border-2 border-rose-500/60 shadow-xl"
               />
 
               <div className="flex-1 text-center sm:text-left">
-                <h1 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-rose-400 to-indigo-400">
+                <h1 className="text-3xl sm:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-rose-400 to-indigo-400">
                   {user.name}
                 </h1>
+
                 <p className="text-slate-400 mt-1 break-all">
                   {user.email}
                 </p>
 
-                <div className="mt-6 grid grid-cols-2 sm:grid-cols-3 gap-4 text-sm">
+                <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
                   <Stat label="User ID" value={user._id} />
                   <Stat label="Friends" value={friends.length} />
                   <Stat
@@ -159,10 +159,11 @@ const Profile = () => {
                   />
                 </div>
 
-                <div className="mt-6">
+                {/* CENTERED EDIT BUTTON */}
+                <div className="mt-8 flex justify-center sm:justify-start">
                   <Link
                     to="/EditProfile"
-                    className="inline-block px-6 py-2.5 rounded-xl bg-gradient-to-r from-rose-500 to-pink-500 text-white font-semibold shadow-lg hover:scale-105 transition"
+                    className="px-8 py-3 rounded-xl bg-gradient-to-r from-rose-500 to-pink-500 text-white font-bold shadow-xl hover:scale-105 transition"
                   >
                     Edit Profile
                   </Link>
@@ -179,8 +180,8 @@ const Profile = () => {
               friends.map((f) => (
                 <Row key={f._id}>
                   <UserMini user={f} />
-                  <div className="flex gap-2">
-                    <Btn onClick={() => navigate("/chat")} text="Chat" color="indigo" />
+                  <div className="flex flex-wrap gap-2 justify-center sm:justify-end">
+                    <Btn onClick={() => navigate(`/chat/${f._id}`)} text="Chat" color="indigo" />
                     <Btn onClick={() => handleUnfriend(f._id)} text="Unfriend" color="amber" />
                     <Btn onClick={() => handleBlock(f._id)} text="Block" color="rose" />
                   </div>
@@ -196,7 +197,7 @@ const Profile = () => {
             ) : (
               blockedUsers.map((u) => (
                 <Row key={u._id}>
-                  <span className="text-slate-300">{u.name || u._id}</span>
+                  <span className="text-slate-300 truncate">{u.name || u._id}</span>
                   <Btn onClick={() => handleUnblock(u._id)} text="Unblock" color="emerald" />
                 </Row>
               ))
@@ -212,7 +213,7 @@ const Profile = () => {
 /* ================= SMALL COMPONENTS ================= */
 
 const Stat = ({ label, value }) => (
-  <div className="rounded-xl bg-slate-950/70 border border-slate-700 p-3">
+  <div className="rounded-xl bg-slate-950/70 border border-slate-700 p-4">
     <p className="text-xs text-slate-400 uppercase">{label}</p>
     <p className="text-slate-200 font-semibold truncate">{value}</p>
   </div>
@@ -232,9 +233,9 @@ const Row = ({ children }) => (
 );
 
 const UserMini = ({ user }) => (
-  <div>
+  <div className="text-center sm:text-left">
     <p className="text-slate-200 font-semibold">{user.name}</p>
-    <p className="text-sm text-slate-400">{user.email}</p>
+    <p className="text-sm text-slate-400 break-all">{user.email}</p>
   </div>
 );
 
@@ -249,7 +250,7 @@ const Btn = ({ text, onClick, color }) => {
   return (
     <button
       onClick={onClick}
-      className={`px-3 py-1.5 rounded text-white text-sm transition ${colors[color]}`}
+      className={`px-4 py-2 rounded-lg text-white text-sm font-semibold transition ${colors[color]}`}
     >
       {text}
     </button>
@@ -257,7 +258,7 @@ const Btn = ({ text, onClick, color }) => {
 };
 
 const Empty = ({ text }) => (
-  <p className="text-slate-400">{text}</p>
+  <p className="text-slate-400 text-center">{text}</p>
 );
 
 export default Profile;

@@ -12,10 +12,12 @@ const server = http.createServer(app);
 const { Server } = require("socket.io");
 const io = new Server(server, {
   cors: {
-    origin: "*",
-    methods: ["GET", "POST"]
+    origin: "http://localhost:5173",
+    methods: ["GET", "POST"],
+    credentials: true
   }
 });
+
 
 // Initialize chat socket
 const chatSocket = app.get("chatSocket");
