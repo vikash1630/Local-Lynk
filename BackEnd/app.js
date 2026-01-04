@@ -11,9 +11,10 @@ app.use((req, res, next) => {
 });
 
 app.use(cors({
-  origin: "http://localhost:5173", // Adjust this to your frontend's origin
+  origin: true,
   credentials: true
 }));
+
 app.use(express.json());
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
