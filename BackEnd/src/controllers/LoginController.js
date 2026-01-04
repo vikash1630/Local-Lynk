@@ -8,10 +8,12 @@ exports.login = async (req, res) => {
 
     res.cookie("token", result.token, {
       httpOnly: true,
-      secure: true,      // true in prod
-      sameSite: "lax",    // IMPORTANT
+      secure: true,          // REQUIRED for HTTPS
+      sameSite: "none",      // REQUIRED for cross-site (Vercel → Render)
+      path: "/",             // REQUIRED
       maxAge: 7 * 24 * 60 * 60 * 1000
     });
+
 
     console.log("Cookie with user : ", result.userId);
     console.log("Cookie set with token:", result.token);

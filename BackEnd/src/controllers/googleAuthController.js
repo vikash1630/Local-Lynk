@@ -37,12 +37,15 @@ exports.googleLogin = async (req, res) => {
 
     res.cookie("token", jwtToken, {
       httpOnly: true,
-      sameSite: "lax",
-      secure: true
+      secure: true,          // REQUIRED (HTTPS)
+      sameSite: "none",      // REQUIRED (cross-site)
+      path: "/",             // REQUIRED
+      maxAge: 7 * 24 * 60 * 60 * 1000
     });
 
     console.log("user id :", user.id);
-    return res.status(200).json({      message: "Google authentication successful",
+    return res.status(200).json({
+      message: "Google authentication successful",
       token: jwtToken,
       userId: user._id,
     });
