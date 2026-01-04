@@ -38,7 +38,7 @@ exports.googleLogin = async (req, res) => {
     res.cookie("token", jwtToken, {
       httpOnly: true,
       sameSite: "lax",
-      secure: false
+      secure: true
     });
 
     console.log("user id :", user.id);
