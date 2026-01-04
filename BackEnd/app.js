@@ -1,194 +1,147 @@
 const express = require("express");
-
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
 
-
 const app = express();
+
+/* ---------------- LOG INCOMING REQUESTS ---------------- */
 app.use((req, res, next) => {
   console.log("📥 Incoming request:", req.method, req.url);
   next();
 });
 
-app.use(cors({
-  origin: true,
-  credentials: true
-}));
+/* ---------------- CORS (CORRECT FOR VERCEL + COOKIES) ---------------- */
+app.use(
+  cors({
+    origin: true,          // ✅ reflect request origin
+    credentials: true      // ✅ allow cookies
+  })
+);
 
+/* ---------------- MIDDLEWARES ---------------- */
 app.use(express.json());
-app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
-
+app.use(cookieParser());
 
 console.log("App.js Running...");
 
-// Health Check
+/* ---------------- HEALTH CHECK ---------------- */
 app.get("/", (req, res) => {
-  res.status(200).json({ message: "Local Lynk Backend Running from home Route" });
+  res.status(200).json({
+    message: "Local Lynk Backend Running from home Route"
+  });
 });
 
-// Test Route
+/* ---------------- TEST ROUTE ---------------- */
 app.get("/test", (req, res) => {
   res.status(200).json({
     receivedBody: req.body
   });
 });
 
-
-// Import Routes
-
-// signup route
+/* ---------------- IMPORT ROUTES ---------------- */
 const signUpRoute = require("./src/routes/SignUpRoute");
-
-// login route
-const LoginRoute = require("./src/routes/loginRoute");
-
-
-// Add Product Route
-const addProductRoute = require("./src/routes/addProductRoute");
-
-// logout route
+const loginRoute = require("./src/routes/loginRoute");
 const logoutRoute = require("./src/routes/LogoutRoute");
-
-// Google Login Route
 const googleLoginRoute = require("./src/routes/googleLoginRoute");
 
-// Nearby Products Route
-const nearByProductsRoute = require("./src/routes/NearByProductsRoute")
+const addProductRoute = require("./src/routes/addProductRoute");
+const near_toggleRoute = require("./src/routes/NearByProductsRoute");
+const searchRoute = require("./src/routes/ProductSearchRoute");
+const productByIdRoute = require("./src/routes/productByIdRoute");
+const productListRoute = require("./src/routes/productListRoute");
+const allProductListRoute = require("./src/routes/AllProductsRoute");
 
-// Search Route
-const searchRoute = require("./src/routes/ProductSearchRoute")
-
-// product by id route
-const productByIdRoute = require("./src/routes/productByIdRoute")
-
-// Product List Route
-const productListRoute = require("./src/routes/productListRoute")
-
-// User List Route
 const userListRoute = require("./src/routes/UsersListRoute");
 
-// Send Friend Request Route
 const sendFriendRequestRoute = require("./src/routes/SendFriendRequestRoute");
-
-// Accept Friend Request Route
-const acceptFriendRequestRoute = require("./src/routes/AcceptFriendRequestRoute")
-
-// Reject Friend Request Route
+const acceptFriendRequestRoute = require("./src/routes/AcceptFriendRequestRoute");
 const rejectFriendRequestRoute = require("./src/routes/RejectFriendRequestRoute");
+const unFriendRoute = require("./src/routes/UnFriendRoute");
 
-// Block User Route
 const blockUserRoute = require("./src/routes/BlockUserRoute");
+const unblockUserRoute = require("./src/routes/UnBlockUserRoute");
+const blockedUserListRoute = require("./src/routes/BlockedUserListRoute");
 
-// Unblock User Route
-const unblockUserRoute = require("./src/routes/UnBlockUserRoute")
+const getProfileRoute = require("./src/routes/GetProfileRoute");
+const getFriendsRoute = require("./src/routes/GetFriendsRoute");
+const getRequestsRoute = require("./src/routes/GetRequestsRoute");
+const getSentRequestsRoute = require("./src/routes/GetSentRequestsRoute");
 
-// Get Profile Details Route
-const getProfileRoute = require("./src/routes/GetProfileRoute")
+const addToCartRoute = require("./src/routes/AddToCartRoute");
+const removeFromCartRoute = require("./src/routes/RemoveFromCartRoute");
+const cartItemsRoute = require("./src/routes/CartListRoute");
 
-// Friends List Route
-const getFriendsRoute = require("./src/routes/GetFriendsRoute")
+const myProductsRoute = require("./src/routes/MyProductsRoute");
+const markSoldRoute = require("./src/routes/MarkProductAsSoldRoute");
 
-// Unfriend Route
-const unFriendRoute = require("./src/routes/UnFriendRoute")
+const editProfileRoute = require("./src/routes/EditProfileRoute");
 
-// Blocked Users List Route
-const blockedUserListRoute = require("./src/routes/BlockedUserListRoute")
+const buyNowRoute = require("./src/routes/buyNowRoute");
+const myOrdersRoute = require("./src/routes/myOrdersRoute");
+const checkOutRoute = require("./src/routes/CheckOutRoute");
 
-// List of Friend Requests Route
-const getRequestsRoute = require("./src/routes/GetRequestsRoute")
+const chatHistoryRoute = require("./src/routes/GetChatHistoryRoute");
+const fileUploadRoute = require("./src/routes/saveFileToCloudinaryRoute");
 
-// List of Friend Requests Sent
-const getSentRequestsRoute = require("./src/routes/GetSentRequestsRoute")
-
-// All Products Route
-const AllproductListRoute = require("./src/routes/AllProductsRoute")
-
-// Add to Cart Route
-const addToCartRoute = require("./src/routes/AddToCartRoute")
-
-// Remove from Cart Route
-const removeFromCartRoute = require("./src/routes/RemoveFromCartRoute")
-
-// List of Cart Items Route
-const cartItemsRoute = require("./src/routes/CartListRoute")
-
-// List My Products 
-const MyProducts = require("./src/routes/MyProductsRoute");
-
-// Mark Product Sold
-const MarkSold = require("./src/routes/MarkProductAsSoldRoute")
-
-// Edit Profile 
-const EditProfile = require("./src/routes/EditProfileRoute")
-
-// Buy Now
-const BuyNow = require("./src/routes/buyNowRoute")
-
-// My Orders
-const MyOrders = require("./src/routes/myOrdersRoute")
-
-// Buy Whole Cart
-const CheckOut = require("./src/routes/CheckOutRoute")
-
-// Get chat History
-const ChatHistory = require("./src/routes/GetChatHistoryRoute")
-
-// File Handling using cloudinary
-const fileUpload = require("./src/routes/saveFileToCloudinaryRoute")
-
-console.log()
-
-// Use Routes
+/* ---------------- USE ROUTES ---------------- */
 app.use("/api", signUpRoute);
-app.use("/api", LoginRoute);
+app.use("/api", loginRoute);
 app.use("/api", googleLoginRoute);
 app.use("/api", logoutRoute);
+
 app.use("/api/product", addProductRoute);
-app.use("/api/product", nearByProductsRoute);
+app.use("/api/product", near_toggleRoute);
 app.use("/api/product", searchRoute);
 app.use("/api/product", productByIdRoute);
+
 app.use("/api/products", productListRoute);
+app.use("/api/products", allProductListRoute);
+app.use("/api/products", markSoldRoute);
+
 app.use("/api/users", userListRoute);
+
 app.use("/api/friend", sendFriendRequestRoute);
 app.use("/api/friend", acceptFriendRequestRoute);
 app.use("/api/friend", rejectFriendRequestRoute);
+app.use("/api/friend", unFriendRoute);
+
 app.use("/api/user", blockUserRoute);
 app.use("/api/user", unblockUserRoute);
-app.use("/api/profile", getProfileRoute);
-app.use("/api/friends", getFriendsRoute);
-app.use("/api/friend", unFriendRoute);
 app.use("/api/user", blockedUserListRoute);
 app.use("/api/user", getRequestsRoute);
 app.use("/api/user", getSentRequestsRoute);
-app.use("/api/products", AllproductListRoute);
+
+app.use("/api/profile", getProfileRoute);
+app.use("/api/friends", getFriendsRoute);
+
 app.use("/api/cart", addToCartRoute);
 app.use("/api/cart", removeFromCartRoute);
 app.use("/api/cart", cartItemsRoute);
-app.use("/api/Myproducts", MyProducts)
-app.use("/api/products", MarkSold);
-app.use("/api/EditProfile", EditProfile);
-app.use("/api/orders" , BuyNow)
-app.use("/api/orders" , MyOrders)
-app.use("/api/checkOut", CheckOut)
-app.use("/api/chat", ChatHistory)
-app.use("/api/chat", fileUpload)
 
-// console.log(process.env.CLOUDINARY_CLOUD_NAME)
+app.use("/api/Myproducts", myProductsRoute);
 
-/* attach socket function */
+app.use("/api/EditProfile", editProfileRoute);
+
+app.use("/api/orders", buyNowRoute);
+app.use("/api/orders", myOrdersRoute);
+
+app.use("/api/checkOut", checkOutRoute);
+
+app.use("/api/chat", chatHistoryRoute);
+app.use("/api/chat", fileUploadRoute);
+
+/* ---------------- SOCKET ATTACH ---------------- */
 app.set("chatSocket", require("./src/socket/chat"));
 
-
-// checking if verifyToken middleware works
+/* ---------------- AUTH TEST ROUTES ---------------- */
 const verifyToken = require("./src/middlewares/verifyToken");
-const { getChatHistory } = require("./src/services/GetChatHistoryService");
 
 app.get("/api/user/me", verifyToken, (req, res) => {
   res.status(200).json({
-    userId: req.user.userId || req.user.id // From Jwt 
-  })
-})
+    userId: req.user.userId || req.user.id
+  });
+});
 
 app.get("/protected", verifyToken, (req, res) => {
   res.status(200).json({
@@ -196,8 +149,5 @@ app.get("/protected", verifyToken, (req, res) => {
     user: req.user
   });
 });
-
-
-
 
 module.exports = app;

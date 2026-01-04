@@ -5,28 +5,31 @@ const connectDB = require("./src/config/db");
 
 const PORT = process.env.PORT || 5000;
 
-// Create HTTP server
+/* ---------------- CREATE HTTP SERVER ---------------- */
 const server = http.createServer(app);
 
-// Attach Socket.IO to SAME server
+/* ---------------- SOCKET.IO SETUP ---------------- */
 const { Server } = require("socket.io");
+
 const io = new Server(server, {
   cors: {
-    origin: true,
+    origin: true,          // ✅ reflect frontend origin
     methods: ["GET", "POST"],
     credentials: true
   }
 });
 
-
-
-// Initialize chat socket
+/* ---------------- INIT CHAT SOCKET ---------------- */
 const chatSocket = app.get("chatSocket");
 chatSocket(io);
 
-// Connect DB first, then start server
-connectDB().then(() => {
-  server.listen(PORT, () => {
-    console.log(`🚀 Server running on port ${PORT}`);
+/* ---------------- CONNECT DB & START SERVER ---------------- */
+connectDB()
+  .then(() => {
+    server.listen(PORT, () => {
+      console.log(`🚀 Server running on port ${PORT}`);
+    });
+  })
+  .catch((err) => {
+    console.error("❌ Server failed to start:", err);
   });
-});
