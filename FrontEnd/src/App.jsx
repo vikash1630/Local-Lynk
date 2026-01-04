@@ -19,7 +19,7 @@ import EditProfile from './pages/EditProfile.jsx';
 import MyOrder from './pages/MyOrder.jsx';
 import About from './components/About.jsx';
 import Contact from './components/Contact.jsx';
-import GuestProduct from './components/guestProduct.jsx';
+import GuestProduct from './components/GuestProduct.jsx';
 
 
 const App = () => {
