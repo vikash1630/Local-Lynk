@@ -93,6 +93,19 @@ const Contact = () => {
                 <span className="text-violet-300 font-medium">App 1</span>
                 <br />
                 <a
+                  href="https://rail-pulse-5t74.vercel.app/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-violet-400 transition underline-offset-4 underline"
+                >
+                  Rail-Pulse Railway DashBoard
+                </a>
+              </li>
+
+              <li>
+                <span className="text-violet-300 font-medium">App 2</span>
+                <br />
+                <a
                   href="https://solo-levelling-fitness-model-app.onrender.com"
                   target="_blank"
                   rel="noopener noreferrer"
@@ -103,7 +116,7 @@ const Contact = () => {
               </li>
 
               <li>
-                <span className="text-violet-300 font-medium">App 2</span>
+                <span className="text-violet-300 font-medium">App 3</span>
                 <br />
                 <a
                   href="https://ipl-analytics-dashboard-htof.onrender.com"
@@ -111,20 +124,7 @@ const Contact = () => {
                   rel="noopener noreferrer"
                   className="hover:text-violet-400 transition underline-offset-4 underline"
                 >
-                  IPL Analytics Dashboard
-                </a>
-              </li>
-
-              <li>
-                <span className="text-violet-300 font-medium">App 3</span>
-                <br />
-                <a
-                  href="https://student-speaking-report.onrender.com/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hover:text-violet-400 transition underline-offset-4 underline"
-                >
-                  Student Speaking Report
+                   IPL Analytics Dashboard
                 </a>
               </li>
             </ul>
