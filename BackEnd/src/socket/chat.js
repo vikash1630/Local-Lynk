@@ -31,45 +31,28 @@ const chatSocket = (io) => {
 
     /* ---------------- SEND MESSAGE ---------------- */
     socket.on("sendMessage", async (data) => {
-      const {
-        from,
-        to,
-        message = "",
-        messageType = "text",
-        fileUrl = null
-      } = data;
+      const { from, to, message = "", messageType = "text", fileUrl = null } = data;
 
-      // 🔒 STRICT VALIDATION
       if (
-        !from ||
-        !to ||
-        from === to ||
-        socket.userId !== from ||
+        !from || !to || from === to || socket.userId !== from ||
         (messageType === "text" && !message) ||
         (messageType !== "text" && !fileUrl)
       ) {
         return;
       }
 
-      // ✅ SAVE TO DB
-      const chat = await Chat.create({
-        from,
-        to,
-        message,
-        messageType,
-        fileUrl
-      });
+      try {
+        const chat = await Chat.create({ from, to, message, messageType, fileUrl });
 
-      // ✅ SEND TO RECEIVER
-      io.to(to).emit("receiveMessage", chat);
-
-      // ✅ SEND TO SENDER
-      io.to(from).emit("receiveMessage", chat);
-
-      // ✅ DELIVERY ACK (receiver reached)
-      io.to(from).emit("messageDelivered", {
-        messageId: chat._id
-      });
+        io.to(to).emit("receiveMessage", chat);
+        io.to(from).emit("receiveMessage", chat);
+        io.to(from).emit("messageDelivered", { messageId: chat._id });
+      } catch (err) {
+        console.error("❌ sendMessage DB error:", err.message);
+        socket.emit("messageError", {
+          error: "Failed to send message. Please try again."
+        });
+      }
     });
 
     /* ---------------- DISCONNECT ---------------- */

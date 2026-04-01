@@ -17,15 +17,17 @@ const fileValidationMiddleware = (req, res, next) => {
   }
 
   // 2️⃣ Allowed MIME types
-  const allowedTypes = [
-    "image/png",
-    "image/jpeg",
-    "image/jpg",
-    "video/mp4",
-    "application/pdf",
-    "application/zip",
-    "application/x-zip-compressed"
-  ];
+const allowedTypes = [
+  "image/png",
+  "image/jpeg",
+  "image/jpg",
+  "image/webp",
+  "video/mp4",
+  "application/pdf",
+  "application/zip",
+  "application/x-zip-compressed"
+];
+
 
   // 3️⃣ Check file type
   if (!allowedTypes.includes(req.file.mimetype)) {

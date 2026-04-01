@@ -2,7 +2,11 @@ const saveFileToCloudinaryService = require("../services/saveFileToCloudinarySer
 
 exports.uploadFileController = async (req, res) => {
   try {
-    const result = saveFileToCloudinaryService(req.file);
+    if (!req.file) {
+      return res.status(400).json({ success: false, message: "No file uploaded" });
+    }
+
+    const result = await saveFileToCloudinaryService(req.file);
 
     res.status(201).json({
       success: true,

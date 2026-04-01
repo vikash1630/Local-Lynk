@@ -8,11 +8,13 @@ const {
 } = require("../controllers/saveFileToCloudinaryController")
 
 // Upload file to Cloudinary
+const fileValidationMiddleware = require("../middlewares/fileValidationMiddleware");
+
 router.post(
   "/upload",
   verifyToken,
   upload.single("file"),
+  fileValidationMiddleware,
   uploadFileController
 );
-
 module.exports = router;

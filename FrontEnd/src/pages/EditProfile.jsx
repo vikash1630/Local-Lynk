@@ -17,6 +17,7 @@ const EditProfile = () => {
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const [avatarFile, setAvatarFile] = useState(null); // add this state at top
 
   /* 🌙 Fetch profile */
   useEffect(() => {
@@ -51,14 +52,14 @@ const EditProfile = () => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleAvatarChange = (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
 
-    const reader = new FileReader();
-    reader.onloadend = () => setAvatarPreview(reader.result);
-    reader.readAsDataURL(file);
-  };
+
+const handleAvatarChange = (e) => {
+  const file = e.target.files?.[0];
+  if (!file) return;
+  setAvatarFile(file); // store the actual file
+  setAvatarPreview(URL.createObjectURL(file)); // just for local preview
+};
 
   const handleSubmit = async (e) => {
     e.preventDefault();

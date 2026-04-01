@@ -4,11 +4,17 @@ const cloudinary = require("../config/cloudinary");
 
 const storage = new CloudinaryStorage({
   cloudinary,
-  params: {
-    folder: "products",
-    allowed_formats: ["jpg", "jpeg", "png", "webp"],
-    transformation: [{ width: 1200, height: 1200, crop: "limit" }],
-  },
+  params: async (req, file) => {
+  const isImage = file.mimetype.startsWith("image/");
+  return {
+    folder: isImage ? "products" : "chat_files",
+    allowed_formats: ["jpg", "jpeg", "png", "webp", "pdf", "mp4", "zip"],
+    ...(isImage && {
+      transformation: [{ width: 1200, height: 1200, crop: "limit" }],
+    }),
+    resource_type: isImage ? "image" : "auto",
+  };
+},
 });
 
 const upload = multer({
