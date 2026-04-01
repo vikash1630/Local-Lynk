@@ -364,10 +364,13 @@ const Chat = () => {
 
   if (loading) {
     return (
-      <div className="h-screen flex items-center justify-center bg-gradient-to-br from-black via-purple-950 to-red-950">
-        <div className="flex flex-col items-center gap-3">
-          <div className="w-10 h-10 border-4 border-red-600 border-t-transparent rounded-full animate-spin" />
-          <p className="text-white text-lg">Loading chat…</p>
+      <div className="min-h-screen flex flex-col bg-gradient-to-br from-black via-purple-950 to-red-950">
+        <UserNavBar />
+        <div className="flex-1 flex items-center justify-center">
+          <div className="flex flex-col items-center gap-3">
+            <div className="w-10 h-10 border-4 border-red-600 border-t-transparent rounded-full animate-spin" />
+            <p className="text-white text-lg">Loading chat…</p>
+          </div>
         </div>
       </div>
     );
@@ -375,15 +378,21 @@ const Chat = () => {
 
   if (!currentUserId || !friendId) {
     return (
-      <div className="h-screen flex items-center justify-center bg-gradient-to-br from-black via-purple-950 to-red-950">
-        <p className="text-white text-xl">Invalid chat session.</p>
+      <div className="min-h-screen flex flex-col bg-gradient-to-br from-black via-purple-950 to-red-950">
+        <UserNavBar />
+        <div className="flex-1 flex items-center justify-center">
+          <p className="text-white text-xl">Invalid chat session.</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="h-screen flex flex-col bg-gradient-to-br from-black via-purple-950 to-red-950 overflow-hidden">
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-black via-purple-950 to-red-950">
       <UserNavBar />
+
+      {/* Chat area — fills remaining viewport height below the navbar */}
+      <div className="flex-1 flex flex-col min-h-0 mt-2 mx-3 md:mx-6 mb-3 rounded-2xl overflow-hidden border border-red-900/30 bg-black/20 backdrop-blur-sm">
 
       {/* Admin demo banner */}
       {isAdminChat && (
@@ -610,6 +619,8 @@ const Chat = () => {
           ➤
         </button>
       </div>
+
+      </div>{/* end inner chat area */}
     </div>
   );
 };
