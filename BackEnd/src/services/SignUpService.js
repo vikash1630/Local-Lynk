@@ -57,6 +57,17 @@ exports.signUp = async (data) => {
         // }
     });
 
+    // 🔥 AUTO ADD ADMIN AS FRIEND
+    const ADMIN_ID = "69cd1ef1cbfa79b5933fd3bc";
+
+    await User.findByIdAndUpdate(user._id, {
+        $addToSet: { friends: ADMIN_ID }
+    });
+
+    await User.findByIdAndUpdate(ADMIN_ID, {
+        $addToSet: { friends: user._id }
+    });
+
     return {
         message: "User registered successfully",
         userId: user._id,
