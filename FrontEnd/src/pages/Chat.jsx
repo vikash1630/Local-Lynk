@@ -319,6 +319,7 @@ const Chat = () => {
       try {
         if (xhr.status !== 200 && xhr.status !== 201) throw new Error();
         const res = JSON.parse(xhr.responseText);
+         console.log("UPLOAD RESPONSE:", res);
         socket.emit("sendMessage", {
           from: currentUserId,
           to: friendId,
