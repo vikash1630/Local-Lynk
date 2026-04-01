@@ -183,6 +183,10 @@ const Chat = () => {
     fetch(`${API_URL}/api/chat/history/${friendId}`, { credentials: "include" })
       .then((res) => res.json())
       .then((data) => {
+
+        // ✅ STEP 1: make data safe
+        const safeData = Array.isArray(data) ? data : [];
+
         if (isAdminChat) {
           const welcomeMessage = {
             _id: "welcome-msg",
@@ -195,13 +199,24 @@ const Chat = () => {
           };
 
           setIsTyping(true);
+
           timer = setTimeout(() => {
             setIsTyping(false);
-            const alreadyHasWelcome = data.some((msg) => msg._id === "welcome-msg");
-            setMessages(alreadyHasWelcome ? data : [welcomeMessage, ...data]);
+
+            // ✅ STEP 2: safe usage
+            const alreadyHasWelcome = safeData.some(
+              (msg) => msg._id === "welcome-msg"
+            );
+
+            setMessages(
+              alreadyHasWelcome ? safeData : [welcomeMessage, ...safeData]
+            );
+
           }, 2000);
+
         } else {
-          setMessages(data);
+          // ✅ STEP 3: always safe
+          setMessages(safeData);
         }
       })
       .catch(() => {});
@@ -491,7 +506,7 @@ const Chat = () => {
             </div>
           )}
 
-          {messages.map((msg, i) => {
+          {Array.isArray(messages) && messages.map((msg, i) => {
             const isMe = msg.from === currentUserId;
             const prev = messages[i - 1];
             const showDate =
