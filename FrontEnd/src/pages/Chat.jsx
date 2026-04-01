@@ -529,7 +529,8 @@ const Chat = () => {
 
                 <div className={`flex ${isMe ? "justify-end" : "justify-start"}`}>
                   <div
-                    className={`max-w-[75%] min-w-[80px] px-4 py-3 rounded-2xl shadow-lg
+                    className={`max-w-[75%] min-w-[80px] rounded-2xl shadow-lg
+                      ${msg.messageType === "image" ? "p-1" : "px-4 py-3"}
                       ${
                         isMe
                           ? "bg-gradient-to-br from-orange-500 to-red-600 text-white rounded-br-sm"
@@ -546,26 +547,27 @@ const Chat = () => {
 
                     {/* ── Image ── */}
                     {msg.messageType === "image" && (
-                      // FIX 6: Show image if URL exists; graceful fallback if not
                       fileUrl ? (
-                        <img
-                          src={fileUrl}
-                          className="max-w-[240px] rounded-xl object-cover cursor-pointer hover:opacity-90 transition"
-                          alt="Shared image"
-                          loading="lazy"
-                          onClick={() => setExpandedImg(fileUrl)}
-                          onError={(e) => {
-                            // If image fails to load, swap to fallback text
-                            e.target.style.display = "none";
-                            const fallback = e.target.parentNode.querySelector(".img-fallback");
-                            if (fallback) fallback.style.display = "flex";
-                          }}
-                        />
+                        <div className="overflow-hidden rounded-xl">
+                          <img
+                            src={fileUrl}
+                            className="max-w-[240px] md:max-w-[280px] w-full object-cover cursor-pointer hover:scale-[1.03] transition-transform duration-300 origin-center"
+                            alt="Shared image"
+                            loading="lazy"
+                            onClick={() => setExpandedImg(fileUrl)}
+                            onError={(e) => {
+                              // If image fails to load, hide container and show fallback text
+                              e.target.parentElement.style.display = "none";
+                              const fallback = e.target.closest('div[style*="word-break"]').querySelector(".img-fallback");
+                              if (fallback) fallback.style.display = "flex";
+                            }}
+                          />
+                        </div>
                       ) : null
                     )}
                     {msg.messageType === "image" && (
                       <div
-                        className="img-fallback items-center gap-2 text-xs opacity-60 italic"
+                        className="img-fallback items-center justify-center gap-2 text-xs opacity-60 italic p-2"
                         style={{ display: fileUrl ? "none" : "flex" }}
                       >
                         <span>🖼️</span>
@@ -596,7 +598,9 @@ const Chat = () => {
 
                     {/* Timestamp + delivery status */}
                     <div
-                      className={`flex items-center gap-1.5 mt-1.5 ${
+                      className={`flex items-center gap-1.5 ${
+                        msg.messageType === "image" ? "mt-1 px-1.5 pb-0.5" : "mt-1.5"
+                      } ${
                         isMe ? "justify-end" : "justify-start"
                       }`}
                     >
