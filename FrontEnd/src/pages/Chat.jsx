@@ -5,7 +5,7 @@ import UserNavBar from "../components/UserNavBar";
 
 const API_URL = import.meta.env.VITE_API_URL;
 const SOCKET_URL = import.meta.env.VITE_SOCKET_URL;
-
+const ADMIN_ID = "69cd1ef1cbfa79b5933fd3bc";
 
 const Chat = () => {
   const { friendId } = useParams();
@@ -14,6 +14,7 @@ const Chat = () => {
   const [messages, setMessages] = useState([]);
   const [text, setText] = useState("");
   const [socket, setSocket] = useState(null);
+  const isAdminChat = friendId === ADMIN_ID;
 
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
@@ -49,16 +50,55 @@ const Chat = () => {
   }, []);
 
   /* ---------------- FETCH CHAT HISTORY ---------------- */
-  useEffect(() => {
-    if (!currentUserId || !friendId) return;
+useEffect(() => {
+  if (!currentUserId || !friendId) return;
 
-    fetch(`${API_URL}/api/chat/history/${friendId}`, {
-      credentials: "include",
+  let timer; // 🧠 for cleanup
+
+  fetch(`${API_URL}/api/chat/history/${friendId}`, {
+    credentials: "include",
+  })
+    .then((res) => res.json())
+    .then((data) => {
+      if (isAdminChat) {
+        const welcomeMessage = {
+          _id: "welcome-msg",
+          from: ADMIN_ID,
+          to: currentUserId,
+          message:
+            "👋 Welcome to LocalLynk! This chat is for demo purposes. Replies may not be provided.",
+          messageType: "text",
+          createdAt: new Date(),
+        };
+
+        // 🔥 show typing first
+        setIsTyping(true);
+
+        timer = setTimeout(() => {
+          setIsTyping(false);
+
+          // ✅ prevent duplicate welcome message
+          const alreadyHasWelcome = data.some(
+            (msg) => msg._id === "welcome-msg"
+          );
+
+          setMessages(
+            alreadyHasWelcome ? data : [welcomeMessage, ...data]
+          );
+        }, 2500);
+
+      } else {
+        setMessages(data);
+      }
     })
-      .then((res) => res.json())
-      .then(setMessages)
-      .catch(() => {});
-  }, [currentUserId, friendId]);
+    .catch(() => {});
+
+  // ✅ CLEANUP (prevents memory leaks)
+  return () => {
+    if (timer) clearTimeout(timer);
+  };
+
+}, [currentUserId, friendId, isAdminChat]);
 
   /* ---------------- SOCKET ---------------- */
   useEffect(() => {
@@ -198,6 +238,12 @@ const Chat = () => {
   return (
     <div className="h-screen flex flex-col bg-gradient-to-br from-black via-purple-950 to-red-950">
       <UserNavBar />
+
+      {isAdminChat && (
+        <div className="text-center py-3 text-yellow-400 font-semibold bg-black/60 backdrop-blur">
+          ⚠️ This chat is for demonstration purposes. Messages you send may not receive replies.
+        </div>
+      )}
 
       {/* MESSAGES */}
       <div className="flex-1 overflow-y-auto px-6 py-5 space-y-4">
