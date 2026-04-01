@@ -7,7 +7,7 @@ const saveFileToCloudinaryService = (file) => {
 
   return {
     fileName: file.originalname,
-    fileUrl: file.path,          // Cloudinary URL
+    fileUrl: file.secure_url || file.path,,          // Cloudinary URL
     publicId: file.public_id,    // Cloudinary public_id
     mimeType: file.mimetype,
     size: file.size
