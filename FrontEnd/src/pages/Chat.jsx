@@ -12,8 +12,13 @@ const ADMIN_ID = "69cd1ef1cbfa79b5933fd3bc";
    the backend might return
    ───────────────────────────────────────────── */
 const resolveFileUrl = (msg) =>
-  msg.fileUrl || msg.file_url || msg.fileURL || msg.url || null;
-
+  msg?.fileUrl ||
+  msg?.file_url ||
+  msg?.fileURL ||
+  msg?.url ||
+  msg?.file?.fileUrl ||
+  msg?.file?.url ||
+  null;
 /* ─────────────────────────────────────────────
    REALISTIC BOT REPLY ENGINE
    ───────────────────────────────────────────── */
